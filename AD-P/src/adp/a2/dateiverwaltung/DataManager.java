@@ -28,7 +28,7 @@ public class DataManager implements IDataExchange {
     }
     
     @Override
-    public int getBandAnzahl() {
+    public int getBandCount() {
         return bandAnzahl;
     }
 
@@ -83,7 +83,7 @@ public class DataManager implements IDataExchange {
     }
 
     @Override
-    public void setBandAnzahl(int anzahl) {
+    public void setBandCount(int anzahl) {
         this.bandAnzahl = anzahl;
         for(int i = 0; i <= bandAnzahl; i++) {
             bandmap.put(i, new Band(i,new File(fileGenerator.getPath()+ "/"+i)));

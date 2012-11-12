@@ -5,11 +5,10 @@
 package adp.a2;
 
 import adp.a2.dateiverwaltung.DataManager;
-import adp.a2.dateiverwaltung.FileGenerator;
 import adp.a2.dateiverwaltung.FiboGenerator;
+import adp.a2.dateiverwaltung.FileGenerator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,8 +34,8 @@ public class AD_A2 {
         }
         
         DataManager dm = new DataManager();
-        dm.setBandAnzahl(4);
-        System.out.println(dm.getBandAnzahl());
+        dm.setBandCount(4);
+        System.out.println(dm.getBandCount());
         
         System.out.println(FiboGenerator.berechnefibo(48,3));
         System.out.println(FiboGenerator.berechnefibo(48,7));

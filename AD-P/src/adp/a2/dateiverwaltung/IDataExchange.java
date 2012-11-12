@@ -1,58 +1,82 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package adp.a2.dateiverwaltung;
 
 import java.util.List;
 
 /**
- *
+ * Schnittstelle für den Mehrphasen-Mergesort Algorithmus. Ermöglicht Zurgriff auf die Dateiverwaltung
+ * @version 0.9
  * @author Domani
  */
 
-//TODO JavaDoc fürs Interface
-
 public interface IDataExchange {
-    //bänder = dateien -> String path des bandes
-    //runs = arraylist
-    //andere: verwalten rungröße 
-    
-    //gib uns x zahlen (eher runs?) für band y
+
+    /**
+     * Gibt die Anzahl der Elemente auf dem Band zurück
+     * @param band int - ID des Bandes
+     * @return long - Anzahl Elemente auf dem Band
+     */
     public long getBandSize(int band);
     
-    //alle runs, die auf dem band liegen
+    /**
+     * Gibt eine Liste mit Elementen von Band mit der ID Band zurück;
+     * @param countNumbers int - Anzahl der Elemente die zurückgegeben werden
+     * @param band int - ID des Bandes
+     * @return List<Integer> - Liste mit Elementen
+     */
     public List<Integer> getNumbersOfBand(int countNumbers, int band);
     
     /**
-     *
-     * @param band
-     * @return
+     * Gibt die nächste Zahl von dem Band zurück
+     * @param band int - ID des Bandes
+     * @return int - Nächste Zahl auf dem Band
      */
     public int getNextNumberOfBand(int band);
             
-    //gib uns das leere band
+    /**
+     * Gibt die ID des aktuell leeren Bandes zurück
+     * @return int - ID des leeren Bandes
+     */
     public int getEmptyBand();
     
-    //gib uns anzahl der bänder
-     public int getBandAnzahl();
+    /**
+     * Gibt die Anzahl der zur Verfügung stehenden Bänder zurück
+     * @return int - Anzahl der Bänder
+     */
+     public int getBandCount();
     
-    //set anzahl der bänder
-     public void setBandAnzahl(int anzahl);
+    /**
+     * Setzt die Anzahl der Bänder. Muss vor generateInitialRuns aufgerufen werden.
+     * @param anzahl int - Anzahl der Bänder
+     */
+     public void setBandCount(int anzahl);
      
-    //schreibe auf band (arraylist mit zahlen, welches band)
+    /**
+     * Schreibt eine beliebige Anzahl von Elementen auf ein Band
+     * @param numbers List<Integer> - Liste mit Elementen
+     * @param band int - ID des Bandes
+     */
      public void addNumbersToBand(List<Integer> numbers, int band);
      
+     /**
+      * Schreibt eine einzelne Zahl auf ein Band
+      * @param number int - die zu schreibende Zahl
+      * @param band int - ID des Bandes
+      */
      public void addNumberToBand(int number, int band);
-     
-    //init verteile zahlen (runs?) auf bänder
-    // für initi: die geben usn paras und wir berechnen verteilung
-    //zu beginn: auf welches band wie viele runs bzw welche runs , wie viele bänder -> fibo
+
+     /**
+      * Generiert die Runs und verteilt sie auf die Bänder.
+      * Muss am Anfang ausgeführt werden.
+      * Benötigt setInitialRunLength
+      * Benötigt setBandCount
+      */
      public void generateInitalRuns();
      
-    //angabe runlänge -> anzahl zahlen in einem un immer gleich
-     //public int getRunlaenge();
-     
+     /**
+      * Setzt die Runlänge, die zum Initialisieren verwendet wird.
+      * Muss vor generateInitialRuns ausgeführt werden.
+      * @param length int - Länge eines Runs
+      */
      public void setInitialRunLength(int length);
      
 
