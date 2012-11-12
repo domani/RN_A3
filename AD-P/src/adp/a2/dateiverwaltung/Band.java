@@ -4,11 +4,13 @@
  */
 package adp.a2.dateiverwaltung;
 
+import adp.a2.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +31,7 @@ public class Band {
     public Band(int name, File f){
         this.name = name;
         this.f = f;
+        position = 0;
         
         if(!f.exists())
         {
@@ -43,7 +46,7 @@ public class Band {
             
             try 
             {
-                output = new FileOutputStream(f);
+                output = new FileOutputStream(f, true);
                 input = new FileInputStream(f);
             } 
             catch (FileNotFoundException ex) 
@@ -57,13 +60,48 @@ public class Band {
         return (f.length()==0);
     }
 
-    public void setZahlenVonBand(List<Integer> run, String band) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void addNumbers(List<Integer> numbers) 
+    {
+        for(Integer number : numbers) addNumber(number);
+    }
+    
+    public void addNumber(int number) 
+    {
+        try 
+        {
+            output.write(Util.intToByte(number));
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public long size()
+    {
+        return f.length() / 4;
     }
 
 
-    public List getZahlenVonBand(int band) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public List<Integer> getNumbers(final int countNumber) 
+    {
+        return new ArrayList<Integer>()
+        {{
+            for(int i = 0; i < countNumber; ++i)
+            {
+                byte[] b = new byte[4];
+                try 
+                {
+                    input.read(b, position, 4);
+                } 
+                catch (IOException ex) 
+                {
+                    Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                increasePosition();
+                add(Util.byteAryToInt(b));
+            }
+        }};
     }
     
     public FileOutputStream getOutputStream()
@@ -74,6 +112,25 @@ public class Band {
     public FileInputStream getInputStream()
     {
         return input;
+    }
+    
+    public void clearBand()
+    {
+        //TODO tedten ob strams valide bleiben
+        f.delete();
+        try 
+        {
+            f.createNewFile();
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void increasePosition()
+    {
+        position += 4;
     }
     
 }

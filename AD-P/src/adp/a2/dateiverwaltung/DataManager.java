@@ -5,13 +5,9 @@
 package adp.a2.dateiverwaltung;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -51,7 +47,8 @@ public class DataManager implements IDataExchange {
     }
 
     @Override
-    public void verteileAufBänder() {
+    public void generateInitalRuns() {
+        //TODO fertigstellen
         List<Integer> runsAufList = FiboGenerator.berechnefibo(getRunsGesamt(), bandAnzahl);
         //benötige letzten k positionen vom runsauflist
         for (int i = 0; i <= bandAnzahl; i++) {
@@ -65,24 +62,20 @@ public class DataManager implements IDataExchange {
     }
 
     @Override
-    public int getRunlaenge() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setInitialRunLength(int length) {
+        runLaenge = length;
     }
 
     @Override
-    public void setRunLaenge(int lange) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public int getZahlenAnzahlAufBand(int band) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public long getBandSize(int band) 
+    {
+        return bandmap.get(band).size();
     }
 
 
 
     @Override
-    public int getLeeresBand() {
+    public int getEmptyBand() {
        for(Map.Entry<Integer,Band> elem : bandmap.entrySet()){
            if(elem.getValue().leer()) return elem.getKey();
        }
@@ -98,12 +91,23 @@ public class DataManager implements IDataExchange {
     }
 
     @Override
-    public void setZahlenVonBand(List<Integer> run, String band) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void addNumbersToBand(List<Integer> numbers, int band) {
+        bandmap.get(band).addNumbers(numbers);
+    }
+    
+    @Override
+    public void addNumberToBand(int number, int band) {
+        bandmap.get(band).addNumber(number);
     }
 
     @Override
-    public List getZahlenVonBand(int band) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public List<Integer> getNumbersOfBand(int countNumbers, int band)
+    {
+        return bandmap.get(band).getNumbers(countNumbers);
+    }
+    @Override
+    public int getNextNumberOfBand(int band)
+    {
+        return bandmap.get(band).getNumbers(1).get(0);
     }
 }
