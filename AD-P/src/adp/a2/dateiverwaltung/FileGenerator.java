@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ad_a2;
+package adp.a2.dateiverwaltung;
 
+import adp.a2.Util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -65,7 +66,7 @@ public class FileGenerator {
         Random rand = new Random();
         for(int i = 0; i <= (size*1000)-4;i+=4){
             
-            Output.write(util.intToByte(rand.nextInt(Integer.MAX_VALUE)));
+            Output.write(Util.intToByte(rand.nextInt(Integer.MAX_VALUE)));
         }
     }
     

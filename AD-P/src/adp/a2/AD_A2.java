@@ -2,8 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ad_a2;
+package adp.a2;
 
+import adp.a2.dateiverwaltung.DataManager;
+import adp.a2.dateiverwaltung.FileGenerator;
+import adp.a2.dateiverwaltung.FiboGenerator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;

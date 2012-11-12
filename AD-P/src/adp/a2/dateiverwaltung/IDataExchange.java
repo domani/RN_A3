@@ -2,9 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ad_a2;
+package adp.a2.dateiverwaltung;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
