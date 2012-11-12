@@ -8,7 +8,8 @@ import java.util.List;
  * @author Domani
  */
 
-public interface IDataExchange {
+public interface IDataExchange 
+{
 
     /**
      * Gibt die Anzahl der Elemente auf dem Band zurück
@@ -78,8 +79,5 @@ public interface IDataExchange {
       * @param length int - Länge eines Runs
       */
      public void setInitialRunLength(int length);
-     
 
-
-    
 }
