@@ -112,4 +112,10 @@ public interface IDataExchange
       */
      public void setInitialRunLength(int length);
 
+     /**
+      * Spult das Band zurueck
+      * @param band Der index des zurueckzuspulenden Bandes.
+      * @return  True bei erfolg, false falls nicht.
+      */
+     public boolean rewindBand(int band);
 }
