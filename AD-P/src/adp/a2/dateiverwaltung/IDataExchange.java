@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Schnittstelle für den Mehrphasen-Mergesort Algorithmus. Ermöglicht Zurgriff auf die Dateiverwaltung
- * @version 0.9
+ * @version 0.9.1 =)
  * @author Dominike, Jan M.
  */
 
@@ -22,6 +22,7 @@ public interface IDataExchange
      * Gibt eine Liste mit Elementen von Band mit der ID Band zurück;
      * @param countNumbers int - Anzahl der Elemente die zurückgegeben werden
      * @param band int - ID des Bandes
+     * @deprecated Benutze getNextRunOfBand
      * @return List<Integer> - Liste mit Elementen
      */
     public List<Integer> getNumbersOfBand(int countNumbers, int band);
@@ -30,8 +31,30 @@ public interface IDataExchange
      * Gibt die nächste Zahl von dem Band zurück
      * @param band int - ID des Bandes
      * @return int - Nächste Zahl auf dem Band
+     * @deprecated Benutze getNextRunOfBand
      */
     public int getNextNumberOfBand(int band);
+    
+    /**
+     * Gibt den den nächsten Run von Band mit der ID Band zurück;
+     * @param band int - ID des Bandes
+     * @return List<Integer> - Liste mit Elementen eines Runs
+     */
+    public List<Integer> getNextRunOfBand(int band);
+    
+    /**
+     * Gibt die Anzahl der Elemente des nächsten Runs von Band mit der ID band zurück
+     * @param Band int - ID des Bandes
+     * @return int - Anzahl der Elemente
+     */
+    public int getNextRunSize(int band);
+    
+    /**
+     * Gibt die Anzahl der Runs auf dem Band mit der ID band zurück
+     * @param Band int - ID des Bandes
+     * @return int - Anzahl der Runs auf dem Band
+     */
+    public int getRunCount(int band);
             
     /**
      * Gibt die ID des aktuell leeren Bandes zurück
@@ -55,6 +78,7 @@ public interface IDataExchange
      * Schreibt eine beliebige Anzahl von Elementen auf ein Band
      * @param numbers List<Integer> - Liste mit Elementen
      * @param band int - ID des Bandes
+     * @deprecated Benutze addRunToBand
      */
      public void addNumbersToBand(List<Integer> numbers, int band);
      
@@ -62,8 +86,16 @@ public interface IDataExchange
       * Schreibt eine einzelne Zahl auf ein Band
       * @param number int - die zu schreibende Zahl
       * @param band int - ID des Bandes
+      * @deprecated Benutze addRunToBand
       */
      public void addNumberToBand(int number, int band);
+     
+     /**
+      * Schreibt einen Run auf ein Band
+      * @param run List<Integer> - Liste mit Elementen eines Runs
+      * @param band int - ID des Bandes
+      */
+     public void addRunToBand(List<Integer> run, int band);
 
      /**
       * Generiert die Runs und verteilt sie auf die Bänder.
