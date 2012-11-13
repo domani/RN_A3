@@ -1,5 +1,6 @@
-package a2;
+package adp.a2;
 
+import adp.a2.algorithmus.MehrphasenMergesort;
 import java.util.ArrayList;
 import java.util.List;
 

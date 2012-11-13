@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Schnittstelle für den Mehrphasen-Mergesort Algorithmus. Ermöglicht Zurgriff auf die Dateiverwaltung
  * @version 0.9
- * @author Domani
+ * @author Dominike, Jan M.
  */
 
 public interface IDataExchange 

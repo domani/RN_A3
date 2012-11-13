@@ -1,4 +1,4 @@
-package a2;
+package adp.a2.algorithmus;
 import java.util.ArrayList;
 import java.util.List;
 
