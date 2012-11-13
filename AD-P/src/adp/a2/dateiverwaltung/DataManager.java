@@ -51,7 +51,13 @@ public class DataManager implements IDataExchange
     }
 
     private long getRunsGesamt() {
+        if(elemAnz % runLaenge == 0){
         return (elemAnz / runLaenge);
+        }
+        else {
+            return (elemAnz/ runLaenge)+1;
+        }
+
     }
 
     @Override
@@ -59,23 +65,15 @@ public class DataManager implements IDataExchange
         //TODO fertigstellen
         List<Integer> runsAufList = FiboGenerator.berechnefibo((int) getRunsGesamt(), bandAnzahl-1);
         //benötige letzten k positionen vom runsauflist
-        
-        for (int i = 0; i < bandAnzahl; i++) 
+        System.out.println((int)getRunsGesamt() + "" + runsAufList);
+        int j = 0;
+        for (int i = bandAnzahl-1; i > 0; i--) 
         {
-            for(int a = 0; a < runsAufList.get(runsAufList.size() - 2 - i); a++)
+            int tmp = runsAufList.get(runsAufList.size() - 2 - j);
+            System.out.println(tmp);
+            for(int a = 0; a < tmp; a++)
             {
-                /*
-                byte[] buffer = new byte[1000];
-                try
-                {
-                    int b = fileGenerator.getSource().read(buffer, sourcePos, 4);
-                    b = b;
-                }
-                catch(IOException ex)
-                {
-                    Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                */
+                
                 List<Integer> run = new ArrayList();
 
                 for(int f = 0; f < runLaenge; ++f)
@@ -99,6 +97,7 @@ public class DataManager implements IDataExchange
                 bandmap.get(i).addRun(run);
 
             }
+            ++j;
             
         }
 
@@ -179,5 +178,10 @@ public class DataManager implements IDataExchange
     public void addRunToBand(List<Integer> run, int band)
     {
         bandmap.get(band).addRun(run);
+    }
+
+    @Override
+    public boolean rewindBand(int band) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

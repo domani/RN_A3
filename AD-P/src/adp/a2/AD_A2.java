@@ -44,19 +44,22 @@ public class AD_A2 {
         
         DataManager dm = new DataManager();
         dm.setInitialRunLength(3);
-        dm.setBandCount(4);
+        dm.setBandCount(5);
         dm.generateInitalRuns();
         for(int i = 0; i < dm.getBandCount(); ++i)
         {
             
             System.out.println("Band " + i + " - Größe: " + dm.getBandSize(i) );
-            for(int j = 0; j < dm.getRunCount(i); j++){
+            int runs = dm.getRunCount(i);
+            for(int j = 0; j < runs; j++){
                 List<Integer> run = dm.getNextRunOfBand(i);
                 System.out.println("Run " + j + " " + run.toString());
                 
             
             }
         }
+        
+        System.out.println(FiboGenerator.berechnefibo(25, 3));
         
         
         
