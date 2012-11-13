@@ -42,8 +42,8 @@ public class Main {
 			add(314);
 		}});
 		l.add(new ArrayList<Integer>());
-		MehrphasenMergesort m = new MehrphasenMergesort(l);
-		System.out.println(m.algorithm());
+		//MehrphasenMergesort m = new MehrphasenMergesort(l);
+		//System.out.println(m.algorithm());
 		
 		//ArrayList<String> graph1_shortestPath1 = 
 	}

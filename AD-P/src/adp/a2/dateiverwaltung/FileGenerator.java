@@ -27,6 +27,7 @@ public class FileGenerator {
     private String path;
     private FileOutputStream Output;
     private FileInputStream input;
+    private File f;
     
     public FileGenerator()
     {
@@ -36,17 +37,31 @@ public class FileGenerator {
     
     public FileGenerator(float size, String path)
     {
+        
         this.size = size;
         this.path = path;
         checkPath(path);
         try 
         {
-            File f = new File(path + "/source");
+            f = new File(path + "/source");
             Output = new FileOutputStream(f);
             input = new FileInputStream(f);
         } 
         catch (FileNotFoundException ex) 
         {
+            Logger.getLogger(FileGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            generateNumbers();
+        } catch (IOException ex) {
+            Logger.getLogger(FileGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+        try 
+        {
+            Output.flush();
+            Output.close();
+        } catch (IOException ex) {
             Logger.getLogger(FileGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -69,7 +84,8 @@ public class FileGenerator {
         Random rand = new Random();
         for(int i = 0; i <= (size*1000)-4;i+=4){
             
-            Output.write(Util.intToByte(rand.nextInt(Integer.MAX_VALUE)));
+            //Output.write(Util.intToByte(rand.nextInt(Integer.MAX_VALUE)));
+            Output.write(Util.intToByte(rand.nextInt(15)));
         }
     }
     
@@ -82,5 +98,8 @@ public class FileGenerator {
         return input;
     }
     
+    public long getFileSize(){
+        return f.length();
+    }
     
 }

@@ -9,6 +9,7 @@ import adp.a2.dateiverwaltung.FiboGenerator;
 import adp.a2.dateiverwaltung.FileGenerator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,14 +45,22 @@ public class AD_A2 {
         DataManager dm = new DataManager();
         dm.setInitialRunLength(3);
         dm.setBandCount(4);
-        
+        dm.generateInitalRuns();
         for(int i = 0; i < dm.getBandCount(); ++i)
         {
+            
             System.out.println("Band " + i + " - Größe: " + dm.getBandSize(i) );
-            System.out.println("Run " + i + " - Größe: " + dm.getBandSize(i) );
+            for(int j = 0; j < dm.getRunCount(i); j++){
+                List<Integer> run = dm.getNextRunOfBand(i);
+                System.out.println("Run " + j + " " + run.toString());
+                
             
-            
+            }
         }
+        
+        
+        
+        
     }
 
     public static int[] mergeSort(int left, int right) {

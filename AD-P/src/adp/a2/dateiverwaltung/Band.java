@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +27,13 @@ public class Band {
     private FileInputStream input;
     private long position;
     private List<Run> runQueue;
+    private String path;
 
 
-    public Band(int name, File f){
+    public Band(int name,String path){
         this.name = name;
-        this.f = f;
+        this.f = new File(path);
+        this.path = path;
         position = 0;
         runQueue = new ArrayList();
         
@@ -44,16 +47,16 @@ public class Band {
             {
                 Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            try 
-            {
-                output = new FileOutputStream(f, true);
-                input = new FileInputStream(f);
-            } 
-            catch (FileNotFoundException ex) 
-            {
-                Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        }
+        
+        try 
+        {
+            output = new FileOutputStream(f, true);
+            input = new FileInputStream(f);
+        } 
+        catch (FileNotFoundException ex) 
+        {
+            Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -111,25 +114,32 @@ public class Band {
     {
         final Run run = runQueue.remove(0);
         
-        return new ArrayList<Integer>()
+        List<Integer> elems = new ArrayList<Integer>()
         {{
             for(int i = 0; i < run.size; ++i)
             {
                 byte[] buffer = new byte[4];
                 
-                try
+                for(int x = 0; x < 4; ++x) 
                 {
-                    input.read(buffer, (int) run.position, 4);
+                    try 
+                    {
+                        buffer[x] = (byte) input.read();
+                    }
+                    catch (IOException ex) 
+                    {
+                        Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-                catch(IOException ex)
-                {
-                    Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
+                run.position +=4;
                 increasePosition();
                 add(Util.byteAryToInt(buffer));
             }
         }};
+        
+        if(runQueue.isEmpty()) clearBand();
+        
+        return elems;
     }
 
     /**
@@ -143,17 +153,21 @@ public class Band {
         {{
             for(int i = 0; i < countNumber; ++i)
             {
-                byte[] b = new byte[4];
-                try 
+                byte[] buffer = new byte[4];
+                for(int x = 0; x < 4; ++x) 
                 {
-                    input.read(b, (int)position, 4);
-                } 
-                catch (IOException ex) 
-                {
-                    Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
+                    try 
+                    {
+                        buffer[x] = (byte) input.read();
+                    }
+                    catch (IOException ex) 
+                    {
+                        Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
                 increasePosition();
-                add(Util.byteAryToInt(b));
+                
+                add(Util.byteAryToInt(buffer));
             }
         }};
     }
@@ -171,11 +185,27 @@ public class Band {
     public void clearBand()
     {
         //TODO tedten ob strams valide bleiben
-        f.delete();
+
         runQueue.clear();
         try 
         {
+            output.close();
+            input.close();
+            
+            output = null;
+            input = null;
+            
+            f.delete();
+            
+            
+            f = null;
+
+            
+            f = new File(path);
             f.createNewFile();
+            
+            output = new FileOutputStream(f, true);
+            input = new FileInputStream(f);
         } 
         catch (IOException ex) 
         {

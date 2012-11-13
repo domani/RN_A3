@@ -22,7 +22,7 @@ public class DataManager implements IDataExchange
 {
 
     private int bandAnzahl; //4 eingabe + 1 ausgabe
-    private int elemAnz = 144;
+    private long elemAnz;
     private int runLaenge = 3;
     private Map<Integer,Band> bandmap;
     private FileGenerator fileGenerator; 
@@ -31,6 +31,7 @@ public class DataManager implements IDataExchange
     {
         fileGenerator = new FileGenerator(0.1f);
         bandmap = new HashMap();
+        elemAnz = fileGenerator.getFileSize()/4;
     }
 
     
@@ -45,40 +46,60 @@ public class DataManager implements IDataExchange
     }
 
     //wie viele elemente sollens werden? wo liegen die elemente?
-    public int getElementAnzahl() {
+    public long getElementAnzahl() {
         return elemAnz;
     }
 
-    private int getRunsGesamt() {
+    private long getRunsGesamt() {
         return (elemAnz / runLaenge);
     }
 
     @Override
     public void generateInitalRuns() {
         //TODO fertigstellen
-        List<Integer> runsAufList = FiboGenerator.berechnefibo(getRunsGesamt(), bandAnzahl);
+        List<Integer> runsAufList = FiboGenerator.berechnefibo((int) getRunsGesamt(), bandAnzahl-1);
         //benötige letzten k positionen vom runsauflist
-        int sourcePos = 0;
         
-        for (int i = 0; i <= bandAnzahl; i++) 
+        for (int i = 0; i < bandAnzahl; i++) 
         {
-            List<Integer> run = new ArrayList();
-            for(int a = 0; a < runsAufList.get(runsAufList.size() - 1 - i); ++a)
+            for(int a = 0; a < runsAufList.get(runsAufList.size() - 2 - i); a++)
             {
-                byte[] buffer = new byte[4];
+                /*
+                byte[] buffer = new byte[1000];
                 try
                 {
-                    fileGenerator.getSource().read(buffer, sourcePos, 4);
+                    int b = fileGenerator.getSource().read(buffer, sourcePos, 4);
+                    b = b;
                 }
                 catch(IOException ex)
                 {
                     Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                run.add(Util.byteAryToInt(buffer));
-                sourcePos += 4;
+                */
+                List<Integer> run = new ArrayList();
+
+                for(int f = 0; f < runLaenge; ++f)
+                {
+
+                    byte[] buffer = new byte[4];
+                    for(int x = 0; x < 4; ++x) 
+                    {
+                        try 
+                        {
+                            buffer[x] = (byte) fileGenerator.getSource().read();
+                        }
+                        catch (IOException ex) 
+                        {
+                            Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                    run.add(Util.byteAryToInt(buffer));
+                }
+                bandmap.get(i).addRun(run);
+
             }
-            bandmap.get(i).addRun(run);
+            
         }
 
 
@@ -110,7 +131,7 @@ public class DataManager implements IDataExchange
     public void setBandCount(int anzahl) {
         this.bandAnzahl = anzahl;
         for(int i = 0; i <= bandAnzahl; i++) {
-            bandmap.put(i, new Band(i,new File(fileGenerator.getPath()+ "/"+i)));
+            bandmap.put(i, new Band(i,fileGenerator.getPath()+ "/"+i));
         }
     }
 
