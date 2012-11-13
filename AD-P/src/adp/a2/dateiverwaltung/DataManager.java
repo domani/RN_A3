@@ -91,8 +91,8 @@ public class DataManager implements IDataExchange
                             Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-
-                    run.add(Util.byteAryToInt(buffer));
+                    int elem = Util.byteAryToInt(buffer);
+                    if(elem > -1) run.add(elem);
                 }
                 bandmap.get(i).addRun(run);
 
