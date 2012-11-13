@@ -1,81 +1,92 @@
 package adp.a2.algorithmus;
+import adp.a2.dateiverwaltung.DataManager;
+import adp.a2.dateiverwaltung.IDataExchange;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Mehrphasen Mergesort!
+ * @author Jan, Jonny & Loki
+ */
 public class MehrphasenMergesort {
-
-	private int[] band0 = new int[20];
-	private int[] band1 = new int[20];
-	private int[] band2 = new int[20];
-	// private int[][] baender= new int[3][20];
-	List<List<Integer>> baender = new ArrayList<List<Integer>>();
-	private int[] runlaenge = new int[3];
-	
-	 public MehrphasenMergesort(List<List<Integer>> baender)
+    
+        private final int RUN_LAENGE = 2, ANZAHL_BAENDER = 3;
+	//List<List<Integer>> baender = new ArrayList<List<Integer>>();
+	private int[] runlaenge = new int[ANZAHL_BAENDER];        
+	IDataExchange dataManager;
+        /**
+         * Konstruktor
+         * @param dataManager Der Datamanager auf die Die Baender fuer den Algortihmus liegen.
+         * @param AnzBaender Die Anzal der Baender auf denen Gearbeitet wird <--NICHT IMPLEMENTIERT
+         * @param runLaenge die Startrunlaenge <-- NICHT IMPLEMENTIERT
+         */
+	 public MehrphasenMergesort(IDataExchange dataManager, int AnzBaender,int runLaenge)
 	 {
-		 this.baender = baender;
+		 //this.baender = baender;
+                 this.dataManager = dataManager;                 
 	 }
 
-	public List<Integer> algorithm() {
-		runlaenge[2] = 2;//von _tmpBand2 
-		runlaenge[1] = 2;//von _tmpBand1
-		int eingabeband1=1,eingabeband2=0,iAusgBand=2;//TODO 0 und 1 tauschen
-		List<Integer> ausgabeband = baender.get(iAusgBand);
+         /**
+          * DerAlgortihmus
+          * @return Gibt den Index des Bandes Zurueck, auf dem die Sortierte Zahlenfolge liegt.
+          */
+	public int algorithm() {
+            dataManager.setInitialRunLength(RUN_LAENGE);
+            dataManager.setBandCount(ANZAHL_BAENDER);
+            dataManager.generateInitalRuns();
+            
+
+		runlaenge[2] = RUN_LAENGE;//von _tmpBand2 
+		runlaenge[1] = RUN_LAENGE;//von _tmpBand1
+		int eingabeband1=0,eingabeband2=1,ausgabeband=2;//TODO 0 und 1 tauschen
 		boolean outerLoop = true;
 		while (outerLoop)// So lange durchlaufen bis nur noch 1 Band elemente hat.							
 		{
-			runlaenge[0] = runlaenge[1] + runlaenge[2];
-			List<Integer> _tmpBand = baender.get(eingabeband1);// Durch Variablen ersetztrn
-			List<Integer> _tmpBand2 = baender.get(eingabeband2);// Durch Variablen ersetztrn
+			runlaenge[2] = runlaenge[1] + runlaenge[0];
 			boolean innerLoop = true;
 			while (innerLoop) // bis ein Band leer wird (das nicht das ausgabeband ist)
 			{
 				int run1 = 0, run2 = 0;
 				while (run1 < runlaenge[1] || run2 < runlaenge[2]) {
-//					try{
-					if (((run1 < runlaenge[1])?_tmpBand.get(0):Integer.MAX_VALUE) <= 
-							((run2 < runlaenge[2])?_tmpBand2.get(0):Integer.MAX_VALUE)) {// runlaenge[1] durch  runlaenge i ersetzen
-						ausgabeband.add(_tmpBand.remove(0));
+
+                                    int links = (run1 < runlaenge[1])?dataManager.getNextNumberOfBand(eingabeband1):Integer.MAX_VALUE;
+                                    int rechts = (run2 < runlaenge[2])?dataManager.getNextNumberOfBand(eingabeband2):Integer.MAX_VALUE;
+					if (links <= rechts)
+							 {
+						dataManager.addNumberToBand(links, ausgabeband);
 						run1++;
 					} else {
-
-							ausgabeband.add(_tmpBand2.remove(0));
-							run2++;
-						
+							dataManager.addNumberToBand(rechts, ausgabeband);
+							run2++;						
 					}
-//					}catch(IndexOutOfBoundsException ex){System.out.println("fuck");}
 				}// 2 Runs wurden zu einem verschmolzen
 				
 				int count=0;
-				for(List<Integer> elem : baender)
-				{
-					if (!elem.isEmpty())
+				for(int i=0; i<dataManager.getBandCount();++i)
+				{                                    
+					if (dataManager.getBandSize(i)!=0)
 						count++;
 				}
 				if (count == 1)
 					return ausgabeband;
 				
-				int i = _tmpBand.size();
-				if (0==_tmpBand.size()) {//Pruefen ob ein Run leer ist
+				if (0==dataManager.getBandSize(eingabeband1)) {//Pruefen ob ein Run leer ist
 					innerLoop = false;
 					int buff = eingabeband1;
-					eingabeband1 = iAusgBand;
+					eingabeband1 = ausgabeband;
 					runlaenge[1] = runlaenge[0]; 
-					iAusgBand = buff;					
-					_tmpBand = baender.get(eingabeband1);
-					ausgabeband = baender.get(iAusgBand);
-
+					ausgabeband = buff;
+                                        dataManager.rewindBand(eingabeband1);
+                                        continue;
 				}
-				i = _tmpBand2.size();
-				if (_tmpBand2.size()==0) {//Pruefen ob ein Run leer ist
+				if (dataManager.getBandSize(eingabeband2)==0) {//Pruefen ob ein Run leer ist
 					innerLoop = false;
 					int buff = eingabeband2;
-					eingabeband2 = iAusgBand;
-					iAusgBand = buff;
+					eingabeband2 = ausgabeband;
+					ausgabeband = buff;
 					runlaenge[2] = runlaenge[0];
-					_tmpBand2 = baender.get(eingabeband2);
-					ausgabeband = baender.get(iAusgBand);
-
+                                        dataManager.rewindBand(eingabeband2);
+                                        continue;
 				}
 			}
 			
