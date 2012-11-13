@@ -24,7 +24,7 @@ public class AD_A2 {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws FileNotFoundException {
-        
+        /*
         //System.out.println(java.util.Arrays.toString(mergeSort(0, a.length-1)));
         FileGenerator fg = new FileGenerator(102f);
         try {
@@ -39,7 +39,16 @@ public class AD_A2 {
         
         System.out.println(FiboGenerator.berechnefibo(48,3));
         System.out.println(FiboGenerator.berechnefibo(48,7));
-
+        * */
+        
+        DataManager dm = new DataManager();
+        dm.setInitialRunLength(3);
+        dm.setBandCount(4);
+        
+        for(int i = 0; i < dm.getBandCount(); ++i)
+        {
+            System.out.println();
+        }
     }
 
     public static int[] mergeSort(int left, int right) {

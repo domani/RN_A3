@@ -4,28 +4,35 @@
  */
 package adp.a2.dateiverwaltung;
 
+import adp.a2.Util;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Domani
  */
-public class DataManager implements IDataExchange {
+public class DataManager implements IDataExchange 
+{
 
     private int bandAnzahl; //4 eingabe + 1 ausgabe
     private int elemAnz = 144;
     private int runLaenge = 3;
     private Map<Integer,Band> bandmap;
     private FileGenerator fileGenerator; 
-
     
-    public DataManager(){
-        fileGenerator = new FileGenerator();
+    public DataManager()
+    {
+        fileGenerator = new FileGenerator(0.1f);
         bandmap = new HashMap();
     }
+
     
     @Override
     public int getBandCount() {
@@ -51,10 +58,27 @@ public class DataManager implements IDataExchange {
         //TODO fertigstellen
         List<Integer> runsAufList = FiboGenerator.berechnefibo(getRunsGesamt(), bandAnzahl);
         //benötige letzten k positionen vom runsauflist
-        for (int i = 0; i <= bandAnzahl; i++) {
-            int runAnzahl = runsAufList.get(runsAufList.size() - 1 - i);
-            //
-            //setRunAufBand(List<Integer> run, String band)  
+        int sourcePos = 0;
+        
+        for (int i = 0; i <= bandAnzahl; i++) 
+        {
+            List<Integer> run = new ArrayList();
+            for(int a = 0; a < runsAufList.get(runsAufList.size() - 1 - i); ++a)
+            {
+                byte[] buffer = new byte[4];
+                try
+                {
+                    fileGenerator.getSource().read(buffer, sourcePos, 4);
+                }
+                catch(IOException ex)
+                {
+                    Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                run.add(Util.byteAryToInt(buffer));
+                sourcePos += 4;
+            }
+            bandmap.get(i).addRun(run);
         }
 
 
@@ -105,6 +129,7 @@ public class DataManager implements IDataExchange {
     {
         return bandmap.get(band).getNumbers(countNumbers);
     }
+    
     @Override
     public int getNextNumberOfBand(int band)
     {

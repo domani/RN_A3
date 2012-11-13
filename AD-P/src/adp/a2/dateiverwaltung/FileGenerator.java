@@ -6,10 +6,10 @@ package adp.a2.dateiverwaltung;
 
 import adp.a2.Util;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +26,7 @@ public class FileGenerator {
     private float size;
     private String path;
     private FileOutputStream Output;
+    private FileInputStream input;
     
     public FileGenerator()
     {
@@ -40,7 +41,9 @@ public class FileGenerator {
         checkPath(path);
         try 
         {
-            Output = new FileOutputStream(new File(path + "/source"));
+            File f = new File(path + "/source");
+            Output = new FileOutputStream(f);
+            input = new FileInputStream(f);
         } 
         catch (FileNotFoundException ex) 
         {
@@ -56,7 +59,7 @@ public class FileGenerator {
     
     
     
-    public void checkPath(String aPath){
+    public final void checkPath(String aPath){
        File dir = new File(aPath);
         if(!dir.exists()) dir.mkdirs();
     }
@@ -72,6 +75,11 @@ public class FileGenerator {
     
     public String getPath(){
         return path;
+    }
+    
+    public FileInputStream getSource()
+    {
+        return input;
     }
     
     
