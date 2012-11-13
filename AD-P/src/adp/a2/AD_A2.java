@@ -47,7 +47,10 @@ public class AD_A2 {
         
         for(int i = 0; i < dm.getBandCount(); ++i)
         {
-            System.out.println();
+            System.out.println("Band " + i + " - Größe: " + dm.getBandSize(i) );
+            System.out.println("Run " + i + " - Größe: " + dm.getBandSize(i) );
+            
+            
         }
     }
 
