@@ -46,13 +46,15 @@ public class MehrphasenMergesort {
 			boolean innerLoop = true;
 			while (innerLoop) // bis ein Band leer wird (das nicht das ausgabeband ist)
 			{
+                            System.out.println("eingabeband " + eingabeband1 +  "eingabeband2 " + eingabeband2 + "ausgabeband" + ausgabeband);
 				int run1 = 0, run2 = 0;
 				while (run1 < runlaenge[1] || run2 < runlaenge[2]) {
-
+                                    
                                     int links = (run1 < runlaenge[1])?dataManager.getNextNumberOfBand(eingabeband1):Integer.MAX_VALUE;
                                     int rechts = (run2 < runlaenge[2])?dataManager.getNextNumberOfBand(eingabeband2):Integer.MAX_VALUE;
 					if (links <= rechts)
 							 {
+                                                 
 						dataManager.addNumberToBand(links, ausgabeband);
 						run1++;
 					} else {
@@ -91,6 +93,20 @@ public class MehrphasenMergesort {
 			}
 			
 		}
+                
+                
+                for(int i = 0; i < dataManager.getBandCount(); ++i)
+                {
+
+                    System.out.println("Band " + i + " - Größe: " + dataManager.getBandSize(i) );
+                    int runs = dataManager.getRunCount(i);
+                    for(int j = 0; j < runs; j++){
+                        List<Integer> run = dataManager.getNextRunOfBand(i);
+                        System.out.println("Run " + j + " " + run.toString());
+
+
+                    }
+                }
 
 		return ausgabeband;
 	}

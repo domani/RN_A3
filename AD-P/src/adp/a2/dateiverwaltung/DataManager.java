@@ -8,6 +8,7 @@ import adp.a2.Util;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.logging.Logger;
  */
 public class DataManager implements IDataExchange 
 {
+    //TODO files ordner löschen beim start
 
     private int bandAnzahl; //4 eingabe + 1 ausgabe
     private long elemAnz;
@@ -29,7 +31,7 @@ public class DataManager implements IDataExchange
     
     public DataManager()
     {
-        fileGenerator = new FileGenerator(0.1f);
+        fileGenerator = new FileGenerator(0.576f);
         bandmap = new HashMap();
         elemAnz = fileGenerator.getFileSize()/4;
     }
@@ -67,15 +69,15 @@ public class DataManager implements IDataExchange
         //benötige letzten k positionen vom runsauflist
         System.out.println((int)getRunsGesamt() + "" + runsAufList);
         int j = 0;
+        
+        int rest = runsAufList.get(runsAufList.size() - 1) - (int)getRunsGesamt();
         for (int i = bandAnzahl-1; i > 0; i--) 
         {
             int tmp = runsAufList.get(runsAufList.size() - 2 - j);
             System.out.println(tmp);
-            for(int a = 0; a < tmp; a++)
+            for(int a = 0; a < (tmp-rest); a++)
             {
-                
                 List<Integer> run = new ArrayList();
-
                 for(int f = 0; f < runLaenge; ++f)
                 {
 
@@ -92,17 +94,26 @@ public class DataManager implements IDataExchange
                         }
                     }
                     int elem = Util.byteAryToInt(buffer);
+                    
                     if(elem > -1) run.add(elem);
                 }
-                bandmap.get(i).addRun(run);
+                Collections.sort(run);
+
+                bandmap.get(i).addRun();
+                for(Integer elem : run) if(run.size() > 0 ) bandmap.get(i).addNumber(elem);
+                bandmap.get(i).endRun();
 
             }
+            for(int e = 0; e < rest; ++e)
+            {
+                bandmap.get(i).addRun();
+                bandmap.get(i).endRun();
+                
+            }
+            rest = 0;
             ++j;
             
         }
-
-
-
     }
 
     @Override
@@ -135,37 +146,20 @@ public class DataManager implements IDataExchange
     }
 
     @Override
-    public void addNumbersToBand(List<Integer> numbers, int band) {
-        bandmap.get(band).addNumbers(numbers);
-    }
-    
-    @Override
     public void addNumberToBand(int number, int band) {
         bandmap.get(band).addNumber(number);
     }
 
     @Override
-    public List<Integer> getNumbersOfBand(int countNumbers, int band)
-    {
-        return bandmap.get(band).getNumbers(countNumbers);
-    }
-    
-    @Override
     public int getNextNumberOfBand(int band)
     {
-        return bandmap.get(band).getNumbers(1).get(0);
+        return bandmap.get(band).getNumber();
     }
 
     @Override
-    public List<Integer> getNextRunOfBand(int band)
+    public int getRunSize(int band)
     {
-        return bandmap.get(band).getNextRun();
-    }
-
-    @Override
-    public int getNextRunSize(int band)
-    {
-        return bandmap.get(band).getNextRunSize();
+        return bandmap.get(band).getRunSize();
     }
 
     @Override
@@ -175,13 +169,26 @@ public class DataManager implements IDataExchange
     }
 
     @Override
-    public void addRunToBand(List<Integer> run, int band)
+    public void addRunToBand(int band)
     {
-        bandmap.get(band).addRun(run);
+        bandmap.get(band).addRun();
     }
 
     @Override
-    public boolean rewindBand(int band) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean runFinished(int band) 
+    {
+        return bandmap.get(band).runFinished();
     }
+    
+    @Override
+    public void endAddRun(int band)
+    {
+        bandmap.get(band).endRun();
+    }
+
+    @Override
+    public void clearBand(int band) 
+    {
+        bandmap.get(band).clearBand();
+    }    
 }

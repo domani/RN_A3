@@ -1,6 +1,7 @@
 package adp.a2;
 
 import adp.a2.algorithmus.MehrphasenMergesort;
+import adp.a2.dateiverwaltung.DataManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +42,27 @@ public class Main {
 			add(5);
 			add(314);
 		}});
+                DataManager dm = new DataManager();
 		l.add(new ArrayList<Integer>());
-		//MehrphasenMergesort m = new MehrphasenMergesort(l);
-		//System.out.println(m.algorithm());
+                
+                
+		MehrphasenMergesort m = new MehrphasenMergesort(dm, 3, 2);
+                m.algorithm();
+		
+                System.out.println("\n");
+                
+                for(int i = 0; i < dm.getBandCount(); ++i)
+                {
+
+                    System.out.println("Band " + i + " - Größe: " + dm.getBandSize(i) );
+                    int runs = dm.getRunCount(i);
+                    for(int j = 0; j < runs; j++){
+                        List<Integer> run = dm.getNextRunOfBand(i);
+                        System.out.println("Run " + j + " " + run.toString());
+
+
+                    }
+                }
 		
 		//ArrayList<String> graph1_shortestPath1 = 
 	}

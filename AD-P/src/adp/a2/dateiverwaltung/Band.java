@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -21,11 +22,14 @@ import java.util.logging.Logger;
  * @author Domani
  */
 public class Band {
+    
+    //TODO output / FileOutputStrean rausnehmen
+    
     int name;
-    File f;
+    private File f;
+    private RandomAccessFile rFile;
     private FileOutputStream output;
-    private FileInputStream input;
-    private long position;
+    private Run aktRun;
     private List<Run> runQueue;
     private String path;
 
@@ -33,8 +37,17 @@ public class Band {
     public Band(int name,String path){
         this.name = name;
         this.f = new File(path);
+        try 
+        {
+            this.rFile = new RandomAccessFile(f, "rw");
+        } 
+        catch (FileNotFoundException ex) 
+        {
+            Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         this.path = path;
-        position = 0;
+        
         runQueue = new ArrayList();
         
         if(!f.exists())
@@ -52,7 +65,6 @@ public class Band {
         try 
         {
             output = new FileOutputStream(f, true);
-            input = new FileInputStream(f);
         } 
         catch (FileNotFoundException ex) 
         {
@@ -64,30 +76,29 @@ public class Band {
         return (f.length()==0);
     }
     
-    public void addRun(List<Integer> run)
+    public void addRun()
     {
-        runQueue.add(new Run(run.size(), f.length()));
-        for(Integer number : run) addNumber(number);
-    }
-
-    /**
-     * @deprecated Benutze addRun
-     * @param numbers 
-     */
-    public void addNumbers(List<Integer> numbers) 
-    {
-        for(Integer number : numbers) addNumber(number);
+        aktRun = new Run(0, f.length());
+        runQueue.add(aktRun);
     }
     
+    public void endRun()
+    {
+        aktRun = null;
+    }
+  
     /**
-     * @deprecated use addRun
      * @param number 
      */
     public void addNumber(int number) 
     {
         try 
         {
-            output.write(Util.intToByte(number));
+            aktRun.size++;
+            rFile.seek(aktRun.endRun);
+            rFile.write(Util.intToByte(number));
+            aktRun.calcEndPosition();
+
         } 
         catch (IOException ex) 
         {
@@ -105,95 +116,62 @@ public class Band {
         return runQueue.size();
     }
     
-    public int getNextRunSize()
+    private void setNextRun()
     {
-        return runQueue.get(0).size;
-    }
-    
-    public List<Integer> getNextRun()
-    {
-        final Run run = runQueue.remove(0);
-        
-        List<Integer> elems = new ArrayList<Integer>()
-        {{
-            for(int i = 0; i < run.size; ++i)
-            {
-                byte[] buffer = new byte[4];
-                
-                for(int x = 0; x < 4; ++x) 
-                {
-                    try 
-                    {
-                        buffer[x] = (byte) input.read();
-                    }
-                    catch (IOException ex) 
-                    {
-                        Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                run.position +=4;
-                increasePosition();
-                add(Util.byteAryToInt(buffer));
-            }
-        }};
-        
-        if(runQueue.isEmpty()) clearBand();
-        
-        return elems;
+        aktRun = (runQueue.size() > 0 ) ? runQueue.remove(0) : null;
     }
 
     /**
-     * @deprecated use getNextRun
      * @param countNumber
      * @return 
      */
-    public List<Integer> getNumbers(final int countNumber) 
+    public int getNumber()
     {
-        return new ArrayList<Integer>()
-        {{
-            for(int i = 0; i < countNumber; ++i)
+        if(runFinished()) setNextRun();
+        try 
+        {
+            rFile.seek(aktRun.position);
+            byte[] buffer = new byte[4];
+            for(int i = 0; i < 4; ++i)
             {
-                byte[] buffer = new byte[4];
-                for(int x = 0; x < 4; ++x) 
-                {
-                    try 
-                    {
-                        buffer[x] = (byte) input.read();
-                    }
-                    catch (IOException ex) 
-                    {
-                        Logger.getLogger(DataManager.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                increasePosition();
-                
-                add(Util.byteAryToInt(buffer));
+                buffer[i] = rFile.readByte();
             }
-        }};
+            aktRun.position += 4;
+            aktRun.size--;
+            
+            return Util.byteAryToInt(buffer);
+        } 
+        catch (IOException ex) 
+        {
+            Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
     }
     
-    public FileOutputStream getOutputStream()
+    public int getRunSize()
     {
-        return output;
+        return aktRun.size;
     }
     
-    public FileInputStream getInputStream()
+    public boolean runFinished()
     {
-        return input;
+        if(aktRun == null && runQueue.size() > 0) setNextRun();
+        
+        if(aktRun.size == 0)
+        {
+            setNextRun();
+            return true;
+        }
+        return false;
     }
     
     public void clearBand()
     {
-        //TODO tedten ob strams valide bleiben
-
         runQueue.clear();
         try 
         {
             output.close();
-            input.close();
-            
             output = null;
-            input = null;
             
             f.delete();
             
@@ -205,7 +183,6 @@ public class Band {
             f.createNewFile();
             
             output = new FileOutputStream(f, true);
-            input = new FileInputStream(f);
         } 
         catch (IOException ex) 
         {
@@ -213,20 +190,22 @@ public class Band {
         }
     }
     
-    private void increasePosition()
-    {
-        position += 4;
-    }
- 
     class Run
     {
         public int size;
         public long position;
+        public long endRun;
         
         Run(int size, long position)
         {
             this.size = size;
             this.position = position;
+            calcEndPosition();
+        }
+        
+        public void calcEndPosition()
+        {
+            this.endRun = position + (4 * size);
         }
     }
 }

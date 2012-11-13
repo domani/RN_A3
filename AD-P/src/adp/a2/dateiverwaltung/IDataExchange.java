@@ -25,29 +25,21 @@ public interface IDataExchange
      * @deprecated Benutze getNextRunOfBand
      * @return List<Integer> - Liste mit Elementen
      */
-    public List<Integer> getNumbersOfBand(int countNumbers, int band);
+    //public List<Integer> getNumbersOfBand(int countNumbers, int band);
     
     /**
      * Gibt die nächste Zahl von dem Band zurück
      * @param band int - ID des Bandes
      * @return int - Nächste Zahl auf dem Band
-     * @deprecated Benutze getNextRunOfBand
      */
     public int getNextNumberOfBand(int band);
-    
-    /**
-     * Gibt den den nächsten Run von Band mit der ID Band zurück;
-     * @param band int - ID des Bandes
-     * @return List<Integer> - Liste mit Elementen eines Runs
-     */
-    public List<Integer> getNextRunOfBand(int band);
     
     /**
      * Gibt die Anzahl der Elemente des nächsten Runs von Band mit der ID band zurück
      * @param Band int - ID des Bandes
      * @return int - Anzahl der Elemente
      */
-    public int getNextRunSize(int band);
+    public int getRunSize(int band);
     
     /**
      * Gibt die Anzahl der Runs auf dem Band mit der ID band zurück
@@ -74,19 +66,10 @@ public interface IDataExchange
      */
      public void setBandCount(int anzahl);
      
-    /**
-     * Schreibt eine beliebige Anzahl von Elementen auf ein Band
-     * @param numbers List<Integer> - Liste mit Elementen
-     * @param band int - ID des Bandes
-     * @deprecated Benutze addRunToBand
-     */
-     public void addNumbersToBand(List<Integer> numbers, int band);
-     
      /**
       * Schreibt eine einzelne Zahl auf ein Band
       * @param number int - die zu schreibende Zahl
       * @param band int - ID des Bandes
-      * @deprecated Benutze addRunToBand
       */
      public void addNumberToBand(int number, int band);
      
@@ -95,7 +78,7 @@ public interface IDataExchange
       * @param run List<Integer> - Liste mit Elementen eines Runs
       * @param band int - ID des Bandes
       */
-     public void addRunToBand(List<Integer> run, int band);
+     public void addRunToBand(int band);
 
      /**
       * Generiert die Runs und verteilt sie auf die Bänder.
@@ -111,11 +94,10 @@ public interface IDataExchange
       * @param length int - Länge eines Runs
       */
      public void setInitialRunLength(int length);
-
-     /**
-      * Spult das Band zurueck
-      * @param band Der index des zurueckzuspulenden Bandes.
-      * @return  True bei erfolg, false falls nicht.
-      */
-     public boolean rewindBand(int band);
+     
+     public boolean runFinished(int band);
+     
+     public void endAddRun(int band);
+     
+     public void clearBand(int band);
 }

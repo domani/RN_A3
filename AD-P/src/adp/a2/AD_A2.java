@@ -9,6 +9,7 @@ import adp.a2.dateiverwaltung.FiboGenerator;
 import adp.a2.dateiverwaltung.FileGenerator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,14 +53,19 @@ public class AD_A2 {
             System.out.println("Band " + i + " - Größe: " + dm.getBandSize(i) );
             int runs = dm.getRunCount(i);
             for(int j = 0; j < runs; j++){
-                List<Integer> run = dm.getNextRunOfBand(i);
+                List<Integer> run = new ArrayList();
+                while(!dm.runFinished(i))
+                {
+                    run.add(dm.getNextNumberOfBand(i));
+                }
+                
                 System.out.println("Run " + j + " " + run.toString());
                 
             
             }
         }
         
-        System.out.println(FiboGenerator.berechnefibo(25, 3));
+        //System.out.println(FiboGenerator.berechnefibo(25, 3));
         
         
         
