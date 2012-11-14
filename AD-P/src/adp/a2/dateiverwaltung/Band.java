@@ -157,7 +157,7 @@ public class Band {
     public int getRunSize()
     {
         if(aktRun == null) setNextRun();
-        return aktRun.size;
+        return (aktRun.size == 0) ? 0 : aktRun.size;
     }
     
     public boolean runFinished()
