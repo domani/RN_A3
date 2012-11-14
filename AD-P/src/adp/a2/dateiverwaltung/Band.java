@@ -173,11 +173,12 @@ public class Band {
     {
         if(aktRun == null && runQueue.size() > 0) setNextRun();
         
-        if(aktRun.size == 0)
+        if(aktRun != null && aktRun.size == 0)
         {
             setNextRun();
             return true;
         }
+        else if(aktRun == null) return true;
         return false;
     }
     
