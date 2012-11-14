@@ -108,7 +108,13 @@ public class Band {
     
     public long size()
     {
-        return f.length() / 4;
+        int x = 0;
+        for(int i = 0; i < runQueue.size(); ++i)
+        {
+            x += runQueue.get(0).size;
+        }
+        if(aktRun != null ) x += aktRun.size;
+        return x;
     }
     
     public int getRunCount()
