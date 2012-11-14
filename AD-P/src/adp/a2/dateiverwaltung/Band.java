@@ -73,7 +73,7 @@ public class Band {
     }
     
     public boolean leer(){
-        return (f.length()==0);
+        return runQueue.isEmpty() && aktRun == null;
     }
     
     public void addRun()
