@@ -155,6 +155,12 @@ public class DataManager implements IDataExchange
     {
         return bandmap.get(band).getNumber();
     }
+    
+    @Override
+    public int getNextNumberOfBand(int band, boolean justRead)
+    {
+        return bandmap.get(band).getNumber(!justRead);
+    }
 
     @Override
     public int getRunSize(int band)

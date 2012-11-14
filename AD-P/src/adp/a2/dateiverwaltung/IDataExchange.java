@@ -19,20 +19,13 @@ public interface IDataExchange
     public long getBandSize(int band);
     
     /**
-     * Gibt eine Liste mit Elementen von Band mit der ID Band zurück;
-     * @param countNumbers int - Anzahl der Elemente die zurückgegeben werden
-     * @param band int - ID des Bandes
-     * @deprecated Benutze getNextRunOfBand
-     * @return List<Integer> - Liste mit Elementen
-     */
-    //public List<Integer> getNumbersOfBand(int countNumbers, int band);
-    
-    /**
      * Gibt die nächste Zahl von dem Band zurück
      * @param band int - ID des Bandes
      * @return int - Nächste Zahl auf dem Band
      */
     public int getNextNumberOfBand(int band);
+    
+    public int getNextNumberOfBand(int band, boolean justRead);
     
     /**
      * Gibt die Anzahl der Elemente des nächsten Runs von Band mit der ID band zurück

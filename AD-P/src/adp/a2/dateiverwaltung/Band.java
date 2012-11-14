@@ -126,12 +126,17 @@ public class Band {
     {
         aktRun = (runQueue.size() > 0 ) ? runQueue.remove(0) : null;
     }
+    
+    public int getNumber()
+    {
+        return getNumber(true);
+    }
 
     /**
      * @param countNumber
      * @return 
      */
-    public int getNumber()
+    public int getNumber(boolean deleteReadedNumbers)
     {
         if(runFinished()) setNextRun();
         try 
@@ -142,8 +147,12 @@ public class Band {
             {
                 buffer[i] = rFile.readByte();
             }
-            aktRun.position += 4;
-            aktRun.size--;
+            
+            if(deleteReadedNumbers) 
+            {
+                aktRun.size--;
+                aktRun.position += 4;
+            }
             
             return Util.byteAryToInt(buffer);
         } 
