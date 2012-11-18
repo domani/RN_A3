@@ -1,6 +1,8 @@
 package adp.a2.algorithmus;
 
 import adp.a2.dateiverwaltung.IDataExchange;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Mehrphasen Mergesort!
@@ -11,7 +13,7 @@ public class MultiBandMehrphasenMergesort {
 
     private int RUN_LAENGE = 2, ANZAHL_BAENDER = 3;
     public final static boolean DEBUG = true;
-    private int[] baender;
+    private List<Integer> baenderList;
     //List<List<Integer>> baender = new ArrayList<List<Integer>>();
     int zugriffe = 0;
 //    private int[] runlaenge;
@@ -43,7 +45,7 @@ public class MultiBandMehrphasenMergesort {
     public int algorithm() {
         dataManager.setInitialRunLength(RUN_LAENGE);
         dataManager.setBandCount(ANZAHL_BAENDER);
-        baender= new int[ANZAHL_BAENDER-1];
+        baenderList = new ArrayList<Integer>(ANZAHL_BAENDER-1);
         dataManager.generateInitalRuns();
         if (DEBUG) {
             printBands();
@@ -53,7 +55,7 @@ public class MultiBandMehrphasenMergesort {
         if (DEBUG) {
             System.out.print(" Anzahl der Runs gesamt ");// + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));
             int acc=0;
-            for (int i=0; i<baender.length;++i)
+            for (int i=0; i<ANZAHL_BAENDER-1;++i)
             {
                 acc+=dataManager.getRunCount(i);
             }
@@ -64,7 +66,8 @@ public class MultiBandMehrphasenMergesort {
         {
             if(bandNr == ausgabeband)
                 bandNr++;
-            baender[i]=bandNr;
+            baenderList.add(bandNr);
+            //baender[i]=bandNr;
             bandNr++;
         }//In Baender stehen nun alle Eingangsbaender.
         
@@ -75,55 +78,55 @@ public class MultiBandMehrphasenMergesort {
 //            runlaenge[eingabeband1] = dataManager.getRunSize(eingabeband1);
 //            runlaenge[eingabeband2] = dataManager.getRunSize(eingabeband2);
 //            runlaenge[ausgabeband] = runlaenge[eingabeband1] + runlaenge[eingabeband2];
-            int linkesBand=0,rechtesBand = 1;//Index auf unser Array
+            int bandLinks=0,bandRechts = 1;//Index auf unser Array
             boolean keinBandLeer = true;
             while (keinBandLeer) // bis ein Band leer wird (das nicht das ausgabeband ist)
             {
                 //System.out.println("eingabeband " + eingabeband1 + "eingabeband2 " + eingabeband2 + "ausgabeband" + ausgabeband);
-                if(linkesBand==baender.length-1) linkesBand = 0;
-                rechtesBand=linkesBand+1;
-                if(rechtesBand==baender.length-1) rechtesBand=0;
+                if(bandLinks==baenderList.size()) bandLinks = 0;
+                bandRechts=bandLinks+1;
+                if(bandRechts==baenderList.size()) bandRechts=0;
                 dataManager.addRunToBand(ausgabeband);
                 if (DEBUG) {
                     //System.out.println("\t Runs auf AusgabeBand " + dataManager.getRunCount(ausgabeband) + " auf Eingabeband 1: " + dataManager.getRunCount(eingabeband1) + " auf eingabeband 2: " + dataManager.getRunCount(eingabeband2));
                      printBands();
                 }
-                int runL = dataManager.getRunSize(baender[linkesBand]), runR = dataManager.getRunSize(baender[rechtesBand]);
+                int runL = dataManager.getRunSize(baenderList.get(bandLinks)), runR = dataManager.getRunSize(baenderList.get(bandRechts));
                 int run1 = 1, run2 = 1;
-                int links = (runL>0)?dataManager.getNextNumberOfBand(baender[linkesBand]):Integer.MAX_VALUE;
-                int rechts= (runR>0)?dataManager.getNextNumberOfBand(baender[rechtesBand]):Integer.MAX_VALUE;
-                boolean linkerRunNichtZuende, rechterRunNichtZuende;                
-                linkerRunNichtZuende = (run1 < runL || links != Integer.MAX_VALUE);
-                rechterRunNichtZuende = (run2 < runR || rechts != Integer.MAX_VALUE);
-                while (linkerRunNichtZuende || rechterRunNichtZuende) {//DAs ist die Abarbeitung eines Runs
+                int zahlLinks = (runL>0)?dataManager.getNextNumberOfBand(baenderList.get(bandLinks)):Integer.MAX_VALUE;
+                int zahlRechts= (runR>0)?dataManager.getNextNumberOfBand(baenderList.get(bandRechts)):Integer.MAX_VALUE;
+                boolean runUnfertigLinks, runUnfertigRechts;                
+                runUnfertigLinks = (run1 < runL || zahlLinks != Integer.MAX_VALUE);
+                runUnfertigRechts = (run2 < runR || zahlRechts != Integer.MAX_VALUE);
+                while (runUnfertigLinks || runUnfertigRechts) {//DAs ist die Abarbeitung eines Runs
                     if (DEBUG) {
                         printBands();
                     }
                     //while (!dataManager.runFinished(eingabeband1) || !dataManager.runFinished(eingabeband2)|| links!=Integer.MAX_VALUE || rechts!=Integer.MAX_VALUE) {
-                    if (links <= rechts) {
-                        dataManager.addNumberToBand(links, ausgabeband);
-                        links = (run1 < runL) ? dataManager.getNextNumberOfBand(baender[linkesBand]) : Integer.MAX_VALUE;
+                    if (zahlLinks <= zahlRechts) {
+                        dataManager.addNumberToBand(zahlLinks, ausgabeband);
+                        zahlLinks = (run1 < runL) ? dataManager.getNextNumberOfBand(baenderList.get(bandLinks)) : Integer.MAX_VALUE;
                         // links = (!dataManager.runFinished(eingabeband1)) ? dataManager.getNextNumberOfBand(eingabeband1) : Integer.MAX_VALUE;                                              
                         zugriffe++;
                         run1++;
                     } else {
-                        dataManager.addNumberToBand(rechts, ausgabeband);
+                        dataManager.addNumberToBand(zahlRechts, ausgabeband);
 
-                        rechts = (run2 < runR) ? dataManager.getNextNumberOfBand(baender[rechtesBand]) : Integer.MAX_VALUE;
+                        zahlRechts = (run2 < runR) ? dataManager.getNextNumberOfBand(baenderList.get(bandRechts)) : Integer.MAX_VALUE;
                         //rechts = (!dataManager.runFinished(eingabeband2)) ? dataManager.getNextNumberOfBand(eingabeband2) : Integer.MAX_VALUE;
                         zugriffe++;
                         run2++;
                     }
-                    linkerRunNichtZuende = (run1 < runL || links != Integer.MAX_VALUE);
-                    rechterRunNichtZuende = (run2 < runR || rechts != Integer.MAX_VALUE);
+                    runUnfertigLinks = (run1 < runL || zahlLinks != Integer.MAX_VALUE);
+                    runUnfertigRechts = (run2 < runR || zahlRechts != Integer.MAX_VALUE);
                 }// 2 Runs wurden zu einem verschmolzen
                 dataManager.endAddRun(ausgabeband);
-                dataManager.skipRun(baender[linkesBand]);
-                dataManager.skipRun(baender[rechtesBand]);
+                dataManager.skipRun(baenderList.get(bandLinks));
+                dataManager.skipRun(baenderList.get(bandRechts));
                 
                 if (DEBUG) {
                     printBands();
-                    System.out.println(" Anzahl der Runs gesamt" + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));
+                    //System.out.println(" Anzahl der Runs gesamt" + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));
                 }
                 int countEinRun = 0, countLeer = 0;
                 for (int i = 0; i < dataManager.getBandCount(); ++i) {
@@ -133,7 +136,7 @@ public class MultiBandMehrphasenMergesort {
                         countLeer++;
                     }
                 }
-                if (countEinRun == 1 && countLeer == 2) {
+                if (countEinRun == 1 && countLeer == ANZAHL_BAENDER-1) {
                     printBands();
                     return ausgabeband;
                 }
@@ -141,18 +144,26 @@ public class MultiBandMehrphasenMergesort {
                     printBands();
                 }
                 
-                for (int i =0;i<baender.length;++i)
+                for (int i =0, emptyBands=0;i<baenderList.size();++i)
                 {
-                    if(0==dataManager.getBandSize(baender[i]))
+                    if(0==dataManager.getBandSize(baenderList.get(i)))
                     {
+                        emptyBands++;
+                        if(emptyBands<2){
                         keinBandLeer = false;
-                        int buff = baender[i];
-                        baender[i] = ausgabeband;
+                        int buff = baenderList.get(i);
+                        baenderList.set(i, ausgabeband);
                         ausgabeband = buff;
                         dataManager.clearBand(ausgabeband);
-                        break;
+                        }else{
+                            baenderList.remove(i);
+                        }
+                        
                     }
                 }
+                
+                bandLinks++;
+                
             }
 
         }
