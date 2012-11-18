@@ -94,8 +94,8 @@ public class MehrphasenMergesort {
                 }
                 boolean linkesBandR, rechtesBandR;
                 int runL = dataManager.getRunSize(eingabeband1), runR = dataManager.getRunSize(eingabeband2);
-                linkesBandR = (run1 < dataManager.getRunSize(eingabeband1) || links != Integer.MAX_VALUE);
-                rechtesBandR = (run2 < dataManager.getRunSize(eingabeband2) || rechts != Integer.MAX_VALUE);
+                linkesBandR = (run1 < runL || links != Integer.MAX_VALUE);
+                rechtesBandR = (run2 < runR || rechts != Integer.MAX_VALUE);
                 while (linkesBandR || rechtesBandR) {
 
                     //while (!dataManager.runFinished(eingabeband1) || !dataManager.runFinished(eingabeband2)|| links!=Integer.MAX_VALUE || rechts!=Integer.MAX_VALUE) {
@@ -133,7 +133,7 @@ public class MehrphasenMergesort {
                 }
                 int count = 0;
                 for (int i = 0; i < dataManager.getBandCount(); ++i) {
-                    if (dataManager.getRunCount(i) != 0) {
+                    if (dataManager.getRunCount(i) == 1) {
                         count++;
                     }
                 }
