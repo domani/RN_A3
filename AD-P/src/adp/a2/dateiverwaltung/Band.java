@@ -63,16 +63,7 @@ public class Band {
             }
         }
         
-        /*
-        try 
-        {
-            output = new FileOutputStream(f, true);
-        } 
-        catch (FileNotFoundException ex) 
-        {
-            Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-        }
-         * */
+
          
     }
     
@@ -171,7 +162,7 @@ public class Band {
     public int getRunSize()
     {
         if(aktRun == null) setNextRun();
-        return (aktRun.size == 0) ? 0 : aktRun.size;
+        return (aktRun == null) ? 0 : aktRun.size;
     }
     
     public void skipRun()
@@ -197,7 +188,8 @@ public class Band {
     {
         System.out.println("Band " + name + " - [" + getRunCount() + "]");
         int counter = 0;
-        List<Run> _tmpQueue = runQueue;
+        List<Run> _tmpQueue = new ArrayList();
+        _tmpQueue.addAll(runQueue);
         if(aktRun != null) _tmpQueue.add(aktRun);
         for(Run r : _tmpQueue)
         {
@@ -232,6 +224,7 @@ public class Band {
     public void clearBand()
     {
         runQueue.clear();
+        aktRun = null;
         try 
         {           
             f.delete();
