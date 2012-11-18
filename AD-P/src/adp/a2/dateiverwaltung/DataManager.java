@@ -31,8 +31,14 @@ public class DataManager implements IDataExchange
     
     public DataManager()
     {
-        fileGenerator = new FileGenerator(0.576f);
+        //fileGenerator = new FileGenerator(0.576f); //14 Zahlen
+        fileGenerator = new FileGenerator(0.1f);
         bandmap = new HashMap();
+        File dir = new File(fileGenerator.getPath());
+        for(File elem : dir.listFiles())
+        {
+            if(!elem.getName().equals("source")) elem.delete();
+        }
         elemAnz = fileGenerator.getFileSize()/4;
     }
 
@@ -140,7 +146,7 @@ public class DataManager implements IDataExchange
     @Override
     public void setBandCount(int anzahl) {
         this.bandAnzahl = anzahl;
-        for(int i = 0; i <= bandAnzahl; i++) {
+        for(int i = 0; i < bandAnzahl; i++) {
             bandmap.put(i, new Band(i,fileGenerator.getPath()+ "/"+i));
         }
     }
@@ -197,4 +203,16 @@ public class DataManager implements IDataExchange
     {
         bandmap.get(band).clearBand();
     }    
+    
+    @Override
+    public void printBand(int band)
+    {
+        bandmap.get(band).printBand();
+    }
+    
+    @Override
+    public void skipRun(int band)
+    {
+        bandmap.get(band).skipRun();
+    }
 }

@@ -1,7 +1,5 @@
 package adp.a2.dateiverwaltung;
 
-import java.util.List;
-
 /**
  * Schnittstelle für den Mehrphasen-Mergesort Algorithmus. Ermöglicht Zurgriff auf die Dateiverwaltung
  * @version 0.9.1 =)
@@ -93,4 +91,8 @@ public interface IDataExchange
      public void endAddRun(int band);
      
      public void clearBand(int band);
+     
+     public void printBand(int band);
+     
+     public void skipRun(int band);
 }

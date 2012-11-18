@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +29,7 @@ public class Band {
     int name;
     private File f;
     private RandomAccessFile rFile;
-    private FileOutputStream output;
+    //private FileOutputStream output;
     private Run aktRun;
     private List<Run> runQueue;
     private String path;
@@ -62,6 +63,7 @@ public class Band {
             }
         }
         
+        /*
         try 
         {
             output = new FileOutputStream(f, true);
@@ -70,6 +72,8 @@ public class Band {
         {
             Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
         }
+         * */
+         
     }
     
     public boolean leer(){
@@ -109,17 +113,17 @@ public class Band {
     public long size()
     {
         int x = 0;
-        for(int i = 0; i < runQueue.size(); ++i)
+        for(Run r : runQueue)
         {
-            x += runQueue.get(0).size;
+           x+= r.size;
         }
-        if(aktRun != null ) x += aktRun.size;
+        if(aktRun != null) x += aktRun.size;
         return x;
     }
     
     public int getRunCount()
     {
-        return runQueue.size();
+        return runQueue.size() + ((aktRun != null) ? 1 : 0);
     }
     
     private void setNextRun()
@@ -139,6 +143,7 @@ public class Band {
     public int getNumber(boolean deleteReadedNumbers)
     {
         if(runFinished()) setNextRun();
+        if(aktRun == null) return -1;
         try 
         {
             rFile.seek(aktRun.position);
@@ -169,6 +174,12 @@ public class Band {
         return (aktRun.size == 0) ? 0 : aktRun.size;
     }
     
+    public void skipRun()
+    {
+        aktRun = null;
+        setNextRun();
+    }
+    
     public boolean runFinished()
     {
         if(aktRun == null && runQueue.size() > 0) setNextRun();
@@ -182,14 +193,47 @@ public class Band {
         return false;
     }
     
+    public void printBand()
+    {
+        System.out.println("Band " + name + " - [" + getRunCount() + "]");
+        int counter = 0;
+        List<Run> _tmpQueue = runQueue;
+        if(aktRun != null) _tmpQueue.add(aktRun);
+        for(Run r : _tmpQueue)
+        {
+
+            long runPos = r.position;
+            int runSize = r.size;
+            int[] runNumbers = new int[runSize];
+            for(int a = 0; a < runSize; ++a)
+            {
+                try 
+                {
+                    rFile.seek(runPos);
+                    byte[] buffer = new byte[4];
+                    for(int i = 0; i < 4; ++i)
+                    {
+                        buffer[i] = rFile.readByte();
+                    }
+                    runNumbers[a] = Util.byteAryToInt(buffer);
+                    
+                    runPos += 4;
+                } 
+                catch (IOException ex) 
+                {
+                    Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            System.out.println("Run " + counter++ + " " + Arrays.toString(runNumbers));
+        }
+    }
+    
     public void clearBand()
     {
         runQueue.clear();
         try 
-        {
-            output.close();
-            output = null;
-            
+        {           
             f.delete();
             
             
@@ -199,7 +243,6 @@ public class Band {
             f = new File(path);
             f.createNewFile();
             
-            output = new FileOutputStream(f, true);
         } 
         catch (IOException ex) 
         {
