@@ -46,14 +46,14 @@ public class MehrphasenMergesort {
         dataManager.setInitialRunLength(RUN_LAENGE);
         dataManager.setBandCount(ANZAHL_BAENDER);
         dataManager.generateInitalRuns();
-        if(DEBUG){
-        for(int i = 0; i < dataManager.getBandCount(); ++i)
-        {
-            dataManager.printBand(i);
-        }}
-        
-        
-        if(DEBUG){System.out.println(" Anzahl der Runs gesamt" + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));}
+        if (DEBUG) {
+            printBands();
+        }
+
+
+        if (DEBUG) {
+            System.out.println(" Anzahl der Runs gesamt" + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));
+        }
 
         int ausgabeband = dataManager.getEmptyBand(), eingabeband2 = 1, eingabeband1 = 2;
         if (ausgabeband == 0) {
@@ -78,26 +78,24 @@ public class MehrphasenMergesort {
             while (innerLoop) // bis ein Band leer wird (das nicht das ausgabeband ist)
             {
                 //System.out.println("eingabeband " + eingabeband1 + "eingabeband2 " + eingabeband2 + "ausgabeband" + ausgabeband);
-                int run1 = 0, run2 = 0;
+                
                 dataManager.addRunToBand(ausgabeband);
-                if(DEBUG){dataManager.printBand(ausgabeband);}
-                int links = dataManager.getNextNumberOfBand(eingabeband1);
-                int rechts = dataManager.getNextNumberOfBand(eingabeband2);
                 if (DEBUG) {
                     System.out.println("\t Runs auf AusgabeBand " + dataManager.getRunCount(ausgabeband) + " auf Eingabeband 1: " + dataManager.getRunCount(eingabeband1) + " auf eingabeband 2: " + dataManager.getRunCount(eingabeband2));
-                    System.out.println("AusgabeBand: ");
-                    dataManager.printBand(ausgabeband);
-                    System.out.println("Eingabeband 1: ");
-                    dataManager.printBand(eingabeband1);
-                    System.out.println("eingabeband 2: ");
-                    dataManager.printBand(eingabeband2);
+                     printBands();
                 }
-                boolean linkesBandR, rechtesBandR;
                 int runL = dataManager.getRunSize(eingabeband1), runR = dataManager.getRunSize(eingabeband2);
+                int links, rechts;
+                int run1 = 1, run2 = 1;
+                links = dataManager.getNextNumberOfBand(eingabeband1);
+                rechts = dataManager.getNextNumberOfBand(eingabeband2);
+                boolean linkesBandR, rechtesBandR;                
                 linkesBandR = (run1 < runL || links != Integer.MAX_VALUE);
                 rechtesBandR = (run2 < runR || rechts != Integer.MAX_VALUE);
                 while (linkesBandR || rechtesBandR) {
-
+                    if (DEBUG) {
+                        printBands();
+                    }
                     //while (!dataManager.runFinished(eingabeband1) || !dataManager.runFinished(eingabeband2)|| links!=Integer.MAX_VALUE || rechts!=Integer.MAX_VALUE) {
                     if (links <= rechts) {
                         dataManager.addNumberToBand(links, ausgabeband);
@@ -107,45 +105,44 @@ public class MehrphasenMergesort {
                         run1++;
                     } else {
                         dataManager.addNumberToBand(rechts, ausgabeband);
-                        run2++;
+
                         rechts = (run2 < runR) ? dataManager.getNextNumberOfBand(eingabeband2) : Integer.MAX_VALUE;
                         //rechts = (!dataManager.runFinished(eingabeband2)) ? dataManager.getNextNumberOfBand(eingabeband2) : Integer.MAX_VALUE;
                         zugriffe++;
+                        run2++;
                     }
                     linkesBandR = (run1 < dataManager.getRunSize(eingabeband1) || links != Integer.MAX_VALUE);
                     rechtesBandR = (run2 < dataManager.getRunSize(eingabeband2) || rechts != Integer.MAX_VALUE);
                 }// 2 Runs wurden zu einem verschmolzen
                 dataManager.endAddRun(ausgabeband);
+                dataManager.skipRun(eingabeband1);
+                dataManager.skipRun(eingabeband2);
+                printBands();
                 if (DEBUG) {
                     System.out.println(" Anzahl der Runs gesamt" + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));
-
-//                System.out.println(" Runlaenge auf Band 0 " + dataManager.getRunSize(0) +" auf Band 1 "+ dataManager.getRunSize(1) +" auf Band 2 "+ dataManager.getRunSize(2));
-                    if (dataManager.getRunCount(0) != 0) {
-                        System.out.print(" Runlaenge auf Band 0 " + dataManager.getRunSize(0));
-                    }
-                    if (dataManager.getRunCount(1) != 0) {
-                        System.out.print(" Runlaenge auf Band 1 " + dataManager.getRunSize(1));
-                    }
-                    if (dataManager.getRunCount(2) != 0) {
-                        System.out.print(" Runlaenge auf Band 2 " + dataManager.getRunSize(2));
-                    }
-                    System.out.print("\n");
                 }
-                int countEinRun = 0,countLeer = 0;
+                int countEinRun = 0, countLeer = 0;
                 for (int i = 0; i < dataManager.getBandCount(); ++i) {
                     if (dataManager.getRunCount(i) == 1) {
                         countEinRun++;
-                    }else if(dataManager.getRunCount(i) ==0){
+                    } else if (dataManager.getRunCount(i) == 0) {
                         countLeer++;
                     }
                 }
-                if (countEinRun == 1 && countLeer==2) {
+                if (countEinRun == 1 && countLeer == 2) {
                     int i = dataManager.getRunCount(ausgabeband);
                     i = dataManager.getRunCount(eingabeband1);
                     i = dataManager.getRunCount(eingabeband2);
+                    if (DEBUG) {
+                        printBands();
+                    }
                     return ausgabeband;
                 }
+                if (DEBUG) {
+                    printBands();
+                }
                 long i = dataManager.getBandSize(eingabeband1);
+                i = dataManager.getRunCount(eingabeband1);
                 if (dataManager.getBandSize(eingabeband1) == 0) {//Pruefen ob ein Run leer ist
                     innerLoop = false;
                     int buff = eingabeband1;
@@ -156,6 +153,7 @@ public class MehrphasenMergesort {
                     continue;
                 }
                 i = dataManager.getBandSize(eingabeband2);
+                i = dataManager.getRunCount(eingabeband2);
                 if (dataManager.getBandSize(eingabeband2) == 0) {//Pruefen ob ein Run leer ist
                     innerLoop = false;
                     int buff = eingabeband2;
@@ -171,5 +169,15 @@ public class MehrphasenMergesort {
         }
 
         return ausgabeband;
+    }
+    
+    
+    
+    private void printBands()
+    {
+        System.out.println("_____________________________________");
+             for (int i = 0; i < dataManager.getBandCount(); ++i) {
+                dataManager.printBand(i);
+            }
     }
 }
