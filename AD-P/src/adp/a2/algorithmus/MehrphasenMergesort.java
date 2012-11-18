@@ -46,14 +46,14 @@ public class MehrphasenMergesort {
         dataManager.setInitialRunLength(RUN_LAENGE);
         dataManager.setBandCount(ANZAHL_BAENDER);
         dataManager.generateInitalRuns();
-        
+        if(DEBUG){
         for(int i = 0; i < dataManager.getBandCount(); ++i)
         {
             dataManager.printBand(i);
-        }
+        }}
         
         
-        System.out.println(" Anzahl der Runs gesamt" + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));
+        if(DEBUG){System.out.println(" Anzahl der Runs gesamt" + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));}
 
         int ausgabeband = dataManager.getEmptyBand(), eingabeband2 = 1, eingabeband1 = 2;
         if (ausgabeband == 0) {
@@ -80,7 +80,7 @@ public class MehrphasenMergesort {
                 //System.out.println("eingabeband " + eingabeband1 + "eingabeband2 " + eingabeband2 + "ausgabeband" + ausgabeband);
                 int run1 = 0, run2 = 0;
                 dataManager.addRunToBand(ausgabeband);
-                dataManager.printBand(ausgabeband);
+                if(DEBUG){dataManager.printBand(ausgabeband);}
                 int links = dataManager.getNextNumberOfBand(eingabeband1);
                 int rechts = dataManager.getNextNumberOfBand(eingabeband2);
                 if (DEBUG) {
@@ -109,7 +109,7 @@ public class MehrphasenMergesort {
                         dataManager.addNumberToBand(rechts, ausgabeband);
                         run2++;
                         rechts = (run2 < runR) ? dataManager.getNextNumberOfBand(eingabeband2) : Integer.MAX_VALUE;
-                        rechts = (!dataManager.runFinished(eingabeband2)) ? dataManager.getNextNumberOfBand(eingabeband2) : Integer.MAX_VALUE;
+                        //rechts = (!dataManager.runFinished(eingabeband2)) ? dataManager.getNextNumberOfBand(eingabeband2) : Integer.MAX_VALUE;
                         zugriffe++;
                     }
                     linkesBandR = (run1 < dataManager.getRunSize(eingabeband1) || links != Integer.MAX_VALUE);
