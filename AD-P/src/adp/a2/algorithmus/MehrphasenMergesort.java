@@ -7,10 +7,10 @@ import java.util.List;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 /**
-* Mehrphasen Mergesort!
-*
-* @author Jan, Jonny & Loki
-*/
+ * Mehrphasen Mergesort!
+ *
+ * @author Jan, Jonny & Loki
+ */
 public class MehrphasenMergesort {
 
     private final int RUN_LAENGE = 2, ANZAHL_BAENDER = 3;
@@ -21,14 +21,14 @@ public class MehrphasenMergesort {
     IDataExchange dataManager;
 
     /**
-* Konstruktor
-*
-* @param dataManager Der Datamanager auf die Die Baender fuer den
-* Algortihmus liegen.
-* @param AnzBaender Die Anzal der Baender auf denen Gearbeitet wird
-* <--NICHT IMPLEMENTIERT
-* @param runLaenge die Startrunlaenge <-- NICHT IMPLEMENTIERT
-*/
+     * Konstruktor
+     *
+     * @param dataManager Der Datamanager auf die Die Baender fuer den
+     * Algortihmus liegen.
+     * @param AnzBaender Die Anzal der Baender auf denen Gearbeitet wird
+     * <--NICHT IMPLEMENTIERT
+     * @param runLaenge die Startrunlaenge <-- NICHT IMPLEMENTIERT
+     */
     public MehrphasenMergesort(IDataExchange dataManager, int AnzBaender, int runLaenge) {
         //this.baender = baender;
         this.dataManager = dataManager;
@@ -37,11 +37,11 @@ public class MehrphasenMergesort {
     }
 
     /**
-* DerAlgortihmus
-*
-* @return Gibt den Index des Bandes Zurueck, auf dem die Sortierte
-* Zahlenfolge liegt.
-*/
+     * DerAlgortihmus
+     *
+     * @return Gibt den Index des Bandes Zurueck, auf dem die Sortierte
+     * Zahlenfolge liegt.
+     */
     public int algorithm() {
         dataManager.setInitialRunLength(RUN_LAENGE);
         dataManager.setBandCount(ANZAHL_BAENDER);
@@ -102,7 +102,7 @@ public class MehrphasenMergesort {
                     if (links <= rechts) {
                         dataManager.addNumberToBand(links, ausgabeband);
                         links = (run1 < runL) ? dataManager.getNextNumberOfBand(eingabeband1) : Integer.MAX_VALUE;
-                        // links = (!dataManager.runFinished(eingabeband1)) ? dataManager.getNextNumberOfBand(eingabeband1) : Integer.MAX_VALUE;
+                        // links = (!dataManager.runFinished(eingabeband1)) ? dataManager.getNextNumberOfBand(eingabeband1) : Integer.MAX_VALUE;                                              
                         zugriffe++;
                         run1++;
                     } else {
@@ -119,7 +119,7 @@ public class MehrphasenMergesort {
                 if (DEBUG) {
                     System.out.println(" Anzahl der Runs gesamt" + (dataManager.getRunCount(0) + dataManager.getRunCount(1) + dataManager.getRunCount(2)));
 
-// System.out.println(" Runlaenge auf Band 0 " + dataManager.getRunSize(0) +" auf Band 1 "+ dataManager.getRunSize(1) +" auf Band 2 "+ dataManager.getRunSize(2));
+//                System.out.println(" Runlaenge auf Band 0 " + dataManager.getRunSize(0) +" auf Band 1 "+ dataManager.getRunSize(1) +" auf Band 2 "+ dataManager.getRunSize(2));
                     if (dataManager.getRunCount(0) != 0) {
                         System.out.print(" Runlaenge auf Band 0 " + dataManager.getRunSize(0));
                     }
