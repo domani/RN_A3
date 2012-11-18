@@ -197,7 +197,8 @@ public class Band {
     {
         System.out.println("Band " + name + " - [" + getRunCount() + "]");
         int counter = 0;
-        List<Run> _tmpQueue = runQueue;
+        List<Run> _tmpQueue = new ArrayList();
+        _tmpQueue.addAll(runQueue);
         if(aktRun != null) _tmpQueue.add(aktRun);
         for(Run r : _tmpQueue)
         {
