@@ -87,8 +87,8 @@ public class MehrphasenMergesort {
                 int runL = dataManager.getRunSize(eingabeband1), runR = dataManager.getRunSize(eingabeband2);
                 int links, rechts;
                 int run1 = 1, run2 = 1;
-                links = dataManager.getNextNumberOfBand(eingabeband1);
-                rechts = dataManager.getNextNumberOfBand(eingabeband2);
+                links = (runL>0)?dataManager.getNextNumberOfBand(eingabeband1):Integer.MAX_VALUE;
+                rechts = (runR>0)?dataManager.getNextNumberOfBand(eingabeband2):Integer.MAX_VALUE;
                 boolean linkesBandR, rechtesBandR;                
                 linkesBandR = (run1 < runL || links != Integer.MAX_VALUE);
                 rechtesBandR = (run2 < runR || rechts != Integer.MAX_VALUE);
