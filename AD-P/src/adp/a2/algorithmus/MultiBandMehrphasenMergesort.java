@@ -12,7 +12,7 @@ import java.util.List;
 public class MultiBandMehrphasenMergesort {
 
     private int RUN_LAENGE = 2, ANZAHL_BAENDER = 3;
-    public final static boolean DEBUG = true;
+    public final static boolean DEBUG = false;
     private List<Integer> baenderList;
     //List<List<Integer>> baender = new ArrayList<List<Integer>>();
     int zugriffe = 0;
