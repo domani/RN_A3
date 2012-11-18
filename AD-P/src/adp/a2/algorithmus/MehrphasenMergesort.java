@@ -131,15 +131,15 @@ public class MehrphasenMergesort {
                     }
                     System.out.print("\n");
                 }
-                int countEinRun = 0,countNichtLeer = 0;
+                int countEinRun = 0,countLeer = 0;
                 for (int i = 0; i < dataManager.getBandCount(); ++i) {
                     if (dataManager.getRunCount(i) == 1) {
                         countEinRun++;
-                    }else if(dataManager.getRunCount(i) !=0){
-                        countNichtLeer++;
+                    }else if(dataManager.getRunCount(i) ==0){
+                        countLeer++;
                     }
                 }
-                if (countEinRun == 1 && countNichtLeer==2) {
+                if (countEinRun == 1 && countLeer==2) {
                     int i = dataManager.getRunCount(ausgabeband);
                     i = dataManager.getRunCount(eingabeband1);
                     i = dataManager.getRunCount(eingabeband2);
