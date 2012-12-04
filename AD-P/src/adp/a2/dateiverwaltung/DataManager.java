@@ -106,7 +106,9 @@ public class DataManager implements IDataExchange
                 Collections.sort(run);
 
                 int runID = bandmap.get(i).addRun(run.size());
-                for(Integer elem : run) if(run.size() > 0 ) bandmap.get(i).addNumber(elem,runID);                
+                for(Integer elem : run) 
+                    if(run.size() > 0 ) 
+                        bandmap.get(i).addNumber(elem,runID);                
 
             }
             //Keine Fiktiven Runs

@@ -27,7 +27,7 @@ public class Band {
     private Map<Integer,Band.Run> runQueue;
     private List<Integer> freeRuns;
     private String path;
-    private int runCount=0;
+    private int runCount=-1;
     private static final int ANZAHL_ZAHLEN_IM_PUFFER = 4;
     private static final int BUFFER_SIZE = ANZAHL_ZAHLEN_IM_PUFFER * 4;
 
@@ -59,8 +59,8 @@ public class Band {
     }
 
     public int addRun(int runSize) {
-        runQueue.put(runCount,new Band.Run(runSize, f.length(), rFile));
-        return ++runCount;
+        runQueue.put(++runCount,new Band.Run(runSize, f.length(), rFile));
+        return runCount;
     }
     /**
      * @param number
