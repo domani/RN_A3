@@ -4,15 +4,8 @@
  */
 package adp.a2;
 
+import adp.a2.algorithmus.MSAlgo;
 import adp.a2.dateiverwaltung.DataManager;
-import adp.a2.dateiverwaltung.FiboGenerator;
-import adp.a2.dateiverwaltung.FileGenerator;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -20,39 +13,26 @@ import java.util.logging.Logger;
  */
 public class AD_A2 {
 
-    public static int[] a = {26,85,50,80,30,70,28,63,57,98,53,10,3};
+    //public static int[] a = {26,85,50,80,30,70,28,63,57,98,53,10,3};
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
+               
+        DataManager dm = new DataManager();
+        
         /*
-        //System.out.println(java.util.Arrays.toString(mergeSort(0, a.length-1)));
-        FileGenerator fg = new FileGenerator(102f);
-        try {
-            fg.generateNumbers();
-        } catch (IOException ex) {
-            Logger.getLogger(AD_A2.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        DataManager dm = new DataManager();
-        dm.setBandCount(4);
-        System.out.println(dm.getBandCount());
-        
-        System.out.println(FiboGenerator.berechnefibo(48,3));
-        System.out.println(FiboGenerator.berechnefibo(48,7));
-        * */
-        
-        DataManager dm = new DataManager();
         dm.setInitialRunLength(3);
-        dm.setBandCount(5);
+        dm.setBandCount(3);
         dm.generateInitalRuns();
         for(int i = 0; i < dm.getBandCount(); ++i)
         {
             
             System.out.println("Band " + i + " - Größe: " + dm.getBandSize(i) );
             int runs = dm.getRunCount(i);
-            for(int j = 0; j < runs; j++){
+            for(int j = 0; j < runs; j++)
+            {
                 List<Integer> run = new ArrayList();
                 while(!dm.runFinished(i))
                 {
@@ -64,6 +44,10 @@ public class AD_A2 {
             
             }
         }
+        */
+        
+        MSAlgo algo = new MSAlgo(dm, 3, 3);
+        algo.MehrphasenMergeSort();
         
         //System.out.println(FiboGenerator.berechnefibo(25, 3));
         
@@ -71,7 +55,7 @@ public class AD_A2 {
         
         
     }
-
+/*
     public static int[] mergeSort(int left, int right) {
        int[] tmp = new int[a.length];
         if (left < right) {
@@ -114,4 +98,5 @@ public class AD_A2 {
         }
         System.out.println(java.util.Arrays.toString(a));
     }
+    */
 }
