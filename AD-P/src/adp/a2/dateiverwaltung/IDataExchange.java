@@ -21,16 +21,16 @@ public interface IDataExchange
      * @param band int - ID des Bandes
      * @return int - Nächste Zahl auf dem Band
      */
-    public int getNextNumberOfBand(int band);
+    public int getNextNumberOfBand(int band, int runID);
     
-    public int getNextNumberOfBand(int band, boolean justRead);
+    public int getNextNumberOfBand(int band, int runID, boolean justRead);
     
     /**
      * Gibt die Anzahl der Elemente des nächsten Runs von Band mit der ID band zurück
      * @param Band int - ID des Bandes
      * @return int - Anzahl der Elemente
      */
-    public int getRunSize(int band);
+    public int getRunSize(int band, int runID);
     
     /**
      * Gibt die Anzahl der Runs auf dem Band mit der ID band zurück
@@ -62,14 +62,14 @@ public interface IDataExchange
       * @param number int - die zu schreibende Zahl
       * @param band int - ID des Bandes
       */
-     public void addNumberToBand(int number, int band);
+     public void addNumberToBand(int number, int band, int runID);
      
      /**
       * Schreibt einen Run auf ein Band
       * @param run List<Integer> - Liste mit Elementen eines Runs
       * @param band int - ID des Bandes
       */
-     public void addRunToBand(int band);
+     public int addRunToBand(int band);
 
      /**
       * Generiert die Runs und verteilt sie auf die Bänder.
@@ -86,13 +86,21 @@ public interface IDataExchange
       */
      public void setInitialRunLength(int length);
      
-     public boolean runFinished(int band);
+     public boolean runFinished(int band, int runID);
      
-     public void endAddRun(int band);
+     public void endAddRun(int band, int runID);
      
      public void clearBand(int band);
      
      public void printBand(int band);
      
-     public void skipRun(int band);
+     /**
+      * @deprecated 
+      * @param band
+      * @param runID 
+      * @see getNextRun
+      */
+     public void skipRun(int band, int runID);
+     
+     public int getNextRun(int Band);
 }
