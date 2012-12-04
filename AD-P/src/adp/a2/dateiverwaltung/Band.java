@@ -286,8 +286,8 @@ public class Band {
                     for (int i = 0; i < 4; i++) {
                         buffer2.add(bAry[i]);
                     }
-                }
-                buffer2.notifyAll();
+                
+                buffer2.notifyAll();}
             }
             size++;
             calcEndPosition();
