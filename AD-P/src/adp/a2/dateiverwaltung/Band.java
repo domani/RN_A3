@@ -213,8 +213,8 @@ public class Band {
             new Thread() {
                 @Override
                 public void run() {
-                    int buffSize = (size < BUFFER_SIZE) ? size : BUFFER_SIZE;
-                    buffSize = (buffSize > (size - buffer1.size() - buffer2.size())) ? size - buffer1.size() - buffer2.size() : buffSize;
+                    int buffSize = (size*4 < BUFFER_SIZE) ? size*4 : BUFFER_SIZE;
+                    buffSize = (buffSize > (size*4 - buffer1.size() - buffer2.size())) ? size*4 - buffer1.size() - buffer2.size() : buffSize;
                     if (buffSize < 0) {
                         return;
                     }
@@ -243,7 +243,7 @@ public class Band {
         }
 
         public void addNumber(int number) {
-            int buffSize = (size < BUFFER_SIZE) ? size : BUFFER_SIZE;
+            int buffSize = (size*4 < BUFFER_SIZE) ? size*4 : BUFFER_SIZE;
             synchronized (buffer1) {
                 if (buffer1.size() == BUFFER_SIZE) {
                     linkerBuffer = false;
@@ -323,10 +323,10 @@ public class Band {
             }.start();
         }
 
-        Run(int size, long position, RandomAccessFile rFile) {
+        Run(int maxNoOfNumbers, long position, RandomAccessFile rFile) {
             this.rfile = rFile;
-            this.size = size;
-            this.initialSize=size;
+            this.size = maxNoOfNumbers;
+            this.initialSize=maxNoOfNumbers;
             this.position = position;
             calcEndPosition();
         }
