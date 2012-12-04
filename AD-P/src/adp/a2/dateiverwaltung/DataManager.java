@@ -105,17 +105,17 @@ public class DataManager implements IDataExchange
                 }
                 Collections.sort(run);
 
-                bandmap.get(i).addRun();
-                for(Integer elem : run) if(run.size() > 0 ) bandmap.get(i).addNumber(elem);
-                bandmap.get(i).endRun();
+                int runID = bandmap.get(i).addRun(run.size());
+                for(Integer elem : run) if(run.size() > 0 ) bandmap.get(i).addNumber(elem,runID);                
 
             }
-            for(int e = 0; e < rest; ++e)
-            {
-                bandmap.get(i).addRun();
-                bandmap.get(i).endRun();
-                
-            }
+            //Keine Fiktiven Runs
+//            for(int e = 0; e < rest; ++e)
+//            {
+//                bandmap.get(i).addRun();
+//                bandmap.get(i).endRun();
+//                
+//            }
             rest = 0;
             ++j;
             
@@ -152,26 +152,20 @@ public class DataManager implements IDataExchange
     }
 
     @Override
-    public void addNumberToBand(int number, int band) {
-        bandmap.get(band).addNumber(number);
+    public void addNumberToBand(int number, int band, int runID) {
+        bandmap.get(band).addNumber(number,runID);
     }
 
     @Override
-    public int getNextNumberOfBand(int band)
+    public int getNextNumberOfBand(int band, int runID)
     {
-        return bandmap.get(band).getNumber();
+        return bandmap.get(band).getNumber(runID);
     }
     
     @Override
-    public int getNextNumberOfBand(int band, boolean justRead)
+    public int getRunSize(int band, int runId)
     {
-        return bandmap.get(band).getNumber(!justRead);
-    }
-
-    @Override
-    public int getRunSize(int band)
-    {
-        return bandmap.get(band).getRunSize();
+        return bandmap.get(band).getRunSize(runId);
     }
 
     @Override
@@ -181,22 +175,17 @@ public class DataManager implements IDataExchange
     }
 
     @Override
-    public void addRunToBand(int band)
+    public int addRunToBand(int band, int runSize)
     {
-        bandmap.get(band).addRun();
+        return bandmap.get(band).addRun(runSize);
     }
 
     @Override
-    public boolean runFinished(int band) 
+    public boolean runFinished(int band, int runID) 
     {
-        return bandmap.get(band).runFinished();
+        return bandmap.get(band).runFinished(runID);
     }
     
-    @Override
-    public void endAddRun(int band)
-    {
-        bandmap.get(band).endRun();
-    }
 
     @Override
     public void clearBand(int band) 
@@ -211,8 +200,13 @@ public class DataManager implements IDataExchange
     }
     
     @Override
-    public void skipRun(int band)
+    public void skipRun(int band, int runID)
     {
-        bandmap.get(band).skipRun();
+        bandmap.get(band).skipRun(runID);
+    }
+
+    @Override
+    public int getNextRun(int Band) {
+        return bandmap.get(Band).skipRun();
     }
 }

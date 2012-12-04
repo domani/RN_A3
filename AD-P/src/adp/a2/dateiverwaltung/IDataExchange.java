@@ -17,13 +17,11 @@ public interface IDataExchange
     public long getBandSize(int band);
     
     /**
-     * Gibt die nächste Zahl von dem Band zurück
+     * Gibt die nächste Zahl von dem Band zurück und loescht diese vom Band
      * @param band int - ID des Bandes
      * @return int - Nächste Zahl auf dem Band
      */
     public int getNextNumberOfBand(int band, int runID);
-    
-    public int getNextNumberOfBand(int band, int runID, boolean justRead);
     
     /**
      * Gibt die Anzahl der Elemente des nächsten Runs von Band mit der ID band zurück
@@ -87,8 +85,6 @@ public interface IDataExchange
      public void setInitialRunLength(int length);
      
      public boolean runFinished(int band, int runID);
-     
-     public void endAddRun(int band, int runID);
      
      public void clearBand(int band);
      

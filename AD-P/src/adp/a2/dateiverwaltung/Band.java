@@ -8,7 +8,9 @@ import adp.a2.Util;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,23 +20,19 @@ import java.util.logging.Logger;
  */
 public class Band {
 
-    //TODO output / FileOutputStrean rausnehmen
     int name;
     private File f;
     private RandomAccessFile rFile;
-    //private FileOutputStream output;
-    private Band.Run aktRun;
-    private List<Band.Run> runQueue;
+//    private Band.Run aktRun;
+    private Map<Integer,Band.Run> runQueue;
+    private List<Integer> freeRuns;
     private String path;
-    private boolean linkerPuffer = true;
-    private final List<Byte> readBuffer1 = new ArrayList<Byte>();
-    private final List<Byte> readBuffer2 = new ArrayList<Byte>();
-    private final List<Byte> writeBuffer1 = new ArrayList<Byte>();
-    private final List<Byte> writeBuffer2 = new ArrayList<Byte>();
+    private int runCount=0;
     private static final int ANZAHL_ZAHLEN_IM_PUFFER = 4;
     private static final int BUFFER_SIZE = ANZAHL_ZAHLEN_IM_PUFFER * 4;
 
     public Band(int name, String path) {
+        freeRuns = new ArrayList();
         this.name = name;
         this.f = new File(path);
         try {
@@ -45,7 +43,7 @@ public class Band {
 
         this.path = path;
 
-        runQueue = new ArrayList();
+        runQueue = new HashMap();
 
         if (!f.exists()) {
             try {
@@ -54,226 +52,76 @@ public class Band {
                 Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
-
-
     }
 
     public boolean leer() {
-        return runQueue.isEmpty() && aktRun == null;
+        return runQueue.isEmpty();
     }
 
-    public void addRun() {
-        aktRun = new Band.Run(0, f.length(), rFile);
-        runQueue.add(aktRun);
+    public int addRun(int runSize) {
+        runQueue.put(runCount,new Band.Run(runSize, f.length(), rFile));
+        return ++runCount;
     }
-
-    public void endRun() {
-        aktRun = null;
-    }
-
-//    private void writeBuffer(List<Byte> buffer) {
-//        synchronized (buffer) {
-//            while (buffer.isEmpty()) {
-//                try {
-//                    buffer.wait();
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-//            try {
-//                rFile.seek(aktRun.endRun);
-//                byte[] bAry = new byte[BUFFER_SIZE];
-//                for (int i = 0; i < BUFFER_SIZE; ++i) {
-//                    bAry[i] = buffer.remove(0);
-//                }
-//                rFile.write(bAry);
-//            } catch (IOException ex) {
-//                Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            buffer.notifyAll();
-//        }
-//    }
-
     /**
      * @param number
      */
-    public void addNumber(int number) {
-        aktRun.addNumber(number);
-
-
-        /*
-         * if (writeBuffer1.size() == BUFFER_SIZE) { linkerPuffer = false;
-         * writeBuffer(writeBuffer1); } if (writeBuffer2.size() == BUFFER_SIZE)
-         * { linkerPuffer = true; writeBuffer(writeBuffer2); } if (linkerPuffer)
-         * { synchronized (writeBuffer1) { while (writeBuffer1.size() ==
-         * BUFFER_SIZE) { try { writeBuffer1.wait(); } catch
-         * (InterruptedException ex) {
-         * Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex); }
-         * } byte bAry[] = Util.intToByte(number); for (int i = 0; i < 4; ++i) {
-         * writeBuffer1.add(bAry[i]); } writeBuffer1.notifyAllAll(); } } else {
-         * synchronized (writeBuffer2) { while (writeBuffer2.size() ==
-         * BUFFER_SIZE) { try { writeBuffer2.wait(); } catch
-         * (InterruptedException ex) {
-         * Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex); }
-         * } byte bAry[] = Util.intToByte(number); for (int i = 0; i < 4; ++i) {
-         * writeBuffer1.add(bAry[i]); } writeBuffer2.notifyAllAll(); }
-        }
-         */
+    public void addNumber(int number, int runId) {
+        runQueue.get(runId).addNumber(number);   
     }
 
     public long size() {
         int x = 0;
-        for (Band.Run r : runQueue) {
+        for (Band.Run r : runQueue.values()) {
             x += r.size;
-        }
-        if (aktRun != null) {
-            x += aktRun.size;
         }
         return x;
     }
 
     public int getRunCount() {
-        return runQueue.size() + ((aktRun != null) ? 1 : 0);
+        return runQueue.size();
     }
 
-    private void setNextRun() {
-        aktRun = (runQueue.size() > 0) ? runQueue.remove(0) : null;
-    }
-
-    public int getNumber() {
-        if (runFinished()) {
-            setNextRun();
-        }
-        if (aktRun == null) {
+    public int getNumber(int runId) {
+        if (runFinished(runId)) {
             return -1;
         }
-        return aktRun.getNumber();
+        return runQueue.get(runId).getNumber();//aktRun.getNumber();
     }
 
-//    /**
-//     * @param countNumber
-//     * @return
-//     */
-//    public void getNumber4Buffer(List<Byte> buffer) {
-//
-//        synchronized (buffer) {
-//            while (!buffer.isEmpty()) {
-//                try {
-//                    buffer.wait();
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-//            if (runFinished()) {
-//                setNextRun();
-//            }
-//            //if(aktRun == null) return -1;
-//            try {
-//                rFile.seek(aktRun.position);
-//                if (buffer.isEmpty()) {
-//                    for (int i = 0; i < BUFFER_SIZE; ++i) {
-//                        try {
-//                            buffer.add(rFile.readByte());
-//                        } catch (EOFException ex) {
-//                            break;
-//                        }
-//                    }
-//                }
-//            } catch (IOException ex) {
-//                Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            buffer.notifyAllAll();
-//        }
-//    }
-//    public int getNumber(boolean deleteReadedNumbers) {
-//        if (readBuffer1.isEmpty()) {
-//            linkerPuffer = false;
-//            getNumber4Buffer(readBuffer1);
-//        }
-//        if (readBuffer2.isEmpty()) {
-//            linkerPuffer = true;
-//            getNumber4Buffer(readBuffer2);
-//        }
-//        if (runFinished()) {
-//            setNextRun();
-//        }
-//        if (aktRun == null) {
-//            return -1;
-//        }
-//        byte[] buffer = new byte[4];
-//        if (linkerPuffer) {
-//            synchronized (readBuffer1) {
-//                while (readBuffer1.isEmpty()) {
-//                    try {
-//                        readBuffer1.wait();
-//                    } catch (InterruptedException ex) {
-//                        Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                }
-//                for (int i = 0; i < 4; ++i) {
-//                    buffer[i] = readBuffer1.remove(0);
-//                }
-//                readBuffer1.notifyAllAll();
-//            }
-//        } else {
-//            synchronized (readBuffer2) {
-//                while (readBuffer2.isEmpty()) {
-//                    try {
-//                        readBuffer2.wait();
-//                    } catch (InterruptedException ex) {
-//                        Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                }
-//                for (int i = 0; i < 4; ++i) {
-//                    buffer[i] = readBuffer2.remove(0);
-//                }
-//                readBuffer2.notifyAllAll();
-//            }
-//
-//        }
-//        if (deleteReadedNumbers) {
-//            aktRun.size--;
-//            aktRun.position += 4;
-//        }
-//        return Util.byteAryToInt(buffer);
-//    }
-    public int getRunSize() {
-        if (aktRun == null) {
-            setNextRun();
-        }
-        return (aktRun == null) ? 0 : aktRun.size;
+    
+    public int getRunSize(int runId) {
+        return runQueue.get(runId).size;
     }
 
-    public void skipRun() {
-        aktRun = null;
-        setNextRun();
+    public int skipRun(int runID) {//TODO Skip Run implementieren
+        for (int i = runID; i<runCount;++i)
+        {
+            if(freeRuns.contains(i) &&runQueue.containsKey(i))
+                return i;
+        }
+        return -1;
     }
-
-    public boolean runFinished() {
-        if (aktRun == null && runQueue.size() > 0) {
-            setNextRun();
+    
+    public int skipRun() {//TODO Skip Run implementieren
+        for (int i = 0; i<runCount;++i)
+        {
+            if(freeRuns.contains(i) &&runQueue.containsKey(i))
+                return i;
         }
+        return -1;
+    }
+    
 
-        if (aktRun != null && aktRun.size == 0) {
-            setNextRun();
-            return true;
-        } else if (aktRun == null) {
-            return true;
-        }
-        return false;
+    public boolean runFinished(int runId) {
+        return runQueue.get(runId).runFinished();        
     }
 
     public void printBand() {
         System.out.println("Band " + name + " - [" + getRunCount() + "]");
         int counter = 0;
         List<Band.Run> _tmpQueue = new ArrayList();
-        _tmpQueue.addAll(runQueue);
-        if (aktRun != null) {
-            _tmpQueue.add(aktRun);
-        }
+        _tmpQueue.addAll(runQueue.values());
         for (Band.Run r : _tmpQueue) {
-
             long runPos = r.position;
             int runSize = r.size;
             int[] runNumbers = new int[runSize];
@@ -285,30 +133,22 @@ public class Band {
                         buffer[i] = rFile.readByte();
                     }
                     runNumbers[a] = Util.byteAryToInt(buffer);
-
                     runPos += 4;
                 } catch (IOException ex) {
                     Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-
             System.out.println("Run " + counter++ + " " + Arrays.toString(runNumbers));
         }
     }
 
     public void clearBand() {
         runQueue.clear();
-        aktRun = null;
         try {
             f.delete();
-
-
             f = null;
-
-
-            f = new File(path);
+           f = new File(path);
             f.createNewFile();
-
         } catch (IOException ex) {
             Logger.getLogger(Band.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -316,13 +156,21 @@ public class Band {
 
     class Run {
 
-        public int size;
+        public int size;//TODO size final machen
+        public final int initialSize;
         public long position;
         public long endRun;
         private boolean linkerBuffer = true;
         private final RandomAccessFile rfile;
         private final List<Byte> buffer1 = new ArrayList<Byte>();
         private final List<Byte> buffer2 = new ArrayList<Byte>();
+        
+        public boolean runFinished()
+        {
+            if(position == endRun && buffer1.isEmpty() && buffer2.isEmpty())//TODO Jan dazu befragen!
+                return true;
+            return false;
+        }
 
         public int getNumber() {
             synchronized (buffer1) {
@@ -343,8 +191,6 @@ public class Band {
                 return -1;
             }
             byte[] bAry = new byte[4];
-
-
             if (linkerBuffer) {
                 synchronized (buffer1) {
                     for (int i = 0; i < 4; i++) {
@@ -362,13 +208,11 @@ public class Band {
             }
             size--;
             position += 4;
-
             return Util.byteAryToInt(bAry);
         }
 
         private void readNumberFromFile(final List<Byte> buff) {
             new Thread() {
-
                 @Override
                 public void run() {
                     int buffSize = (size < BUFFER_SIZE) ? size : BUFFER_SIZE;
@@ -484,6 +328,7 @@ public class Band {
         Run(int size, long position, RandomAccessFile rFile) {
             this.rfile = rFile;
             this.size = size;
+            this.initialSize=size;
             this.position = position;
             calcEndPosition();
         }
