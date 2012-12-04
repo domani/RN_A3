@@ -66,10 +66,10 @@ public interface IDataExchange
      
      /**
       * Schreibt einen Run auf ein Band
-      * @param run List<Integer> - Liste mit Elementen eines Runs
+      * @param runSize int - Größe des neuen Runs
       * @param band int - ID des Bandes
       */
-     public int addRunToBand(int band);
+     public int addRunToBand(int band, int runSize);
 
      /**
       * Generiert die Runs und verteilt sie auf die Bänder.
