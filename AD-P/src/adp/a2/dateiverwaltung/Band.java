@@ -60,6 +60,7 @@ public class Band {
 
     public int addRun(int runSize) {
         runQueue.put(++runCount,new Band.Run(runSize, f.length(), rFile));
+        freeRuns.add(runCount);
         return runCount;
     }
     /**
@@ -96,19 +97,16 @@ public class Band {
     public int skipRun(int runID) {//TODO Skip Run implementieren
         for (int i = runID; i<runCount;++i)
         {
-            if(freeRuns.contains(i) &&runQueue.containsKey(i))
+            if(freeRuns.contains(i) &&runQueue.containsKey(i)){                            
+                freeRuns.remove(new Integer(i));
                 return i;
+            }
         }
         return -1;
     }
     
     public int skipRun() {//TODO Skip Run implementieren
-        for (int i = 0; i<runCount;++i)
-        {
-            if(freeRuns.contains(i) &&runQueue.containsKey(i))
-                return i;
-        }
-        return -1;
+        return skipRun(0);
     }
     
 
