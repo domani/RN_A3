@@ -74,6 +74,7 @@ public class FileCopyClient extends Thread {
         buffer.add(makeControlPacket());
         //noch seqNum 0 setzen vorm losschicken
         clientSocket.send(new DatagramPacket(buffer.getPacket(0).getData(), UDP_PACKET_SIZE));
+        startTimer(buffer.getPacket(buffer.size() - 1));
 
         //wieder anfang
         while (bytesRemaining > 0)
@@ -87,6 +88,7 @@ public class FileCopyClient extends Thread {
             //vorm senden timer setzen
             DatagramPacket udpSendPacket = new DatagramPacket(aktData, UDP_PACKET_SIZE);
             clientSocket.send(udpSendPacket);
+            startTimer(buffer.getPacket(buffer.size() - 1));
         }
         synchronized(buffer)
         {
