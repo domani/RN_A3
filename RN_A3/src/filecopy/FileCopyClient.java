@@ -5,8 +5,6 @@ package filecopy;
  Praktikum 3 Rechnernetze BAI4-SS2012 HAW Hamburg
  Autoren:
  */
-import filecopy.FC_Timer;
-import filecopy.FCpacket;
 import java.io.*;
 import java.net.*;
 import java.util.logging.Level;
@@ -30,11 +28,10 @@ public class FileCopyClient extends Thread {
     // -------- Variables
     // current default timeout in nanoseconds
     private long timeoutValue = 100000000L;
-    private long nextSeqNum = 0L;
+    private long nextSeqNum = 1L;
     private long bytesRemaining;
     private long estimatedRTT = 0;
     private long deviation = 0;
-    
     // -------- Buffer
     private File f;
     private FileInputStream in;
@@ -70,12 +67,12 @@ public class FileCopyClient extends Thread {
     public void runFileCopyClient() throws FileNotFoundException, IOException, InterruptedException
     {
         receivePackets();
-        clientSocket = new DatagramSocket(SERVER_PORT);
-        buffer.add(makeControlPacket());
-        //noch seqNum 0 setzen vorm losschicken
-        startTimer(buffer.getPacket(buffer.size() - 1));
-        clientSocket.send(new DatagramPacket(buffer.getPacket(0).getData(), UDP_PACKET_SIZE));
         
+        buffer.add(makeControlPacket());
+        startTimer(buffer.getPacket(0));
+        clientSocket = new DatagramSocket(SERVER_PORT);
+        clientSocket.send(new DatagramPacket(buffer.getPacket(0).getSeqNumBytesAndData(), buffer.getPacket(0).getSeqNumBytesAndData().length));
+
 
         //wieder anfang
         while (bytesRemaining > 0)
@@ -85,16 +82,19 @@ public class FileCopyClient extends Thread {
             byte aktData[] = buffer.getPacket(buffer.size() - 1).getData();
 
             FCpacket.writeBytes(aktSeqNum, aktData, 0, 8);
-            
+
             //vorm senden timer setzen
             startTimer(buffer.getPacket(buffer.size() - 1));
             DatagramPacket udpSendPacket = new DatagramPacket(aktData, UDP_PACKET_SIZE);
             clientSocket.send(udpSendPacket);
-            
+
         }
-        synchronized(buffer)
+        synchronized (buffer)
         {
-            while(!buffer.isEmpty() && bytesRemaining > 0) wait();
+            while (!buffer.isEmpty() && bytesRemaining > 0)
+            {
+                wait();
+            }
         }
     }
 
@@ -146,7 +146,7 @@ public class FileCopyClient extends Thread {
         {
             sendData = new byte[(int) bytesRemaining];
         }
-        
+
         in.read(sendData, 0, sendData.length);
         //schreibt trotzdem senddata mit crap voll
         //dateilänge - offset. falls d-o == 0 || rest < data_packet_size, dann nur restlänge reinschreiben
@@ -188,10 +188,10 @@ public class FileCopyClient extends Thread {
         //Starten Sie für jeden Timer einen Thread der mitgegebenen Klasse FC_Timer und passen Sie
         //den Code für Ihre Implementierung an
         startTimer(buffer.getPacket(seqNum));
-        DatagramPacket udpSendPacket = new DatagramPacket(buffer.getPacket(seqNum).getData(), UDP_PACKET_SIZE);
-        clientSocket.send(udpSendPacket);
-        
-       
+       // DatagramPacket udpSendPacket = new DatagramPacket(buffer.getPacket(seqNum).getData(), UDP_PACKET_SIZE);
+       // clientSocket.send(udpSendPacket);
+
+
     }
 
     /**
@@ -201,19 +201,19 @@ public class FileCopyClient extends Thread {
     public void computeTimeoutValue(long sampleRTT)
     {
         //SampleRTT: gemessene Zeit vom Versenden eines Segments bis zur Bestätigung durch ACK
-        
+
         //Typischer Wert von x: 0,1
-        double x = 0.1; 
-        
+        double x = 0.1;
+
         //erwartete Round Trip Time
         estimatedRTT = (long) ((1 - x) * estimatedRTT + x * sampleRTT);
-        
+
         //Deviation = “sicherer Abstand”
         //Falls die EstimatedRTT starkt variieren -> muss der Sicherheitsabstand größer werden
         deviation = (long) ((1 - x) * deviation + x * Math.abs(sampleRTT - estimatedRTT));
-        timeoutValue = estimatedRTT + 4* deviation;
-        
-    
+        timeoutValue = estimatedRTT + 4 * deviation;
+
+
     }
 
     /**
@@ -235,7 +235,7 @@ public class FileCopyClient extends Thread {
         }
 
 
-        return new FCpacket(0, sendData, sendData.length);
+        return new FCpacket(0L, sendData, sendData.length);
     }
 
     public void testOut(String out)
@@ -252,8 +252,9 @@ public class FileCopyClient extends Thread {
         //hier noch das einfügen, was übergeben werden muss
         //Konstruktor: new FileCopyClient("CowboyBebop", String sourcePath, String destPath, String windowSize, String errorRate)
         //zu testen (Werte ermitteln): windowsize = 1,8,128; error_rate: 10,100,1000                           
-        FileCopyClient myClient = new FileCopyClient(argv[0], argv[1], argv[2],
-                argv[3], argv[4]);
+        FileCopyClient myClient = new FileCopyClient("CowboyBebop", "C:/Users/Domani/Desktop/HAW/BSSicherheit.pdf", "C:/Users/Domani/Desktop/BSSicherheit.pdf",
+                "128", "100");
+        
         myClient.runFileCopyClient();
     }
 }

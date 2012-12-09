@@ -1,5 +1,9 @@
 package filecopy;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /* FC_Timer.java
  Version 1.0
  Praktikum Rechnernetze HAW Hamburg
@@ -44,7 +48,13 @@ public class FC_Timer extends Thread {
 
     /* Perform task if not cancelled */
     if (!isInterrupted()) {
-      myFCC.timeoutTask(seqNum);
+          try
+          {
+              myFCC.timeoutTask(seqNum);
+          } catch (IOException ex)
+          {
+              Logger.getLogger(FC_Timer.class.getName()).log(Level.SEVERE, null, ex);
+          }
     }
   }
 }
