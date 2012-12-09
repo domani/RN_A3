@@ -5,6 +5,8 @@ package filecopy;
  Praktikum 3 Rechnernetze BAI4-SS2012 HAW Hamburg
  Autoren:
  */
+import filecopy.FC_Timer;
+import filecopy.FCpacket;
 import java.io.*;
 import java.net.*;
 import java.util.logging.Level;
@@ -30,6 +32,9 @@ public class FileCopyClient extends Thread {
     private long timeoutValue = 100000000L;
     private long nextSeqNum = 0L;
     private long bytesRemaining;
+    private long estimatedRTT = 0;
+    private long deviation = 0;
+    
     // -------- Buffer
     private File f;
     private FileInputStream in;
@@ -78,6 +83,7 @@ public class FileCopyClient extends Thread {
             byte aktData[] = buffer.getPacket(buffer.size() - 1).getData();
 
             FCpacket.writeBytes(aktSeqNum, aktData, 0, 8);
+            
             //vorm senden timer setzen
             DatagramPacket udpSendPacket = new DatagramPacket(aktData, UDP_PACKET_SIZE);
             clientSocket.send(udpSendPacket);
@@ -171,11 +177,15 @@ public class FileCopyClient extends Thread {
     /**
      * Implementation specific task performed at timeout
      */
-    public void timeoutTask(long seqNum)
+    public void timeoutTask(long seqNum) throws IOException
     {
         // ToDo
         //Starten Sie für jeden Timer einen Thread der mitgegebenen Klasse FC_Timer und passen Sie
         //den Code für Ihre Implementierung an
+        
+        DatagramPacket udpSendPacket = new DatagramPacket(buffer.getPacket(seqNum).getData(), UDP_PACKET_SIZE);
+        clientSocket.send(udpSendPacket);
+       
     }
 
     /**
@@ -184,7 +194,20 @@ public class FileCopyClient extends Thread {
      */
     public void computeTimeoutValue(long sampleRTT)
     {
-        // ToDo
+        //SampleRTT: gemessene Zeit vom Versenden eines Segments bis zur Bestätigung durch ACK
+        
+        //Typischer Wert von x: 0,1
+        double x = 0.1; 
+        
+        //erwartete Round Trip Time
+        estimatedRTT = (long) ((1 - x) * estimatedRTT + x * sampleRTT);
+        
+        //Deviation = “sicherer Abstand”
+        //Falls die EstimatedRTT starkt variieren -> muss der Sicherheitsabstand größer werden
+        deviation = (long) ((1 - x) * deviation + x * Math.abs(sampleRTT - estimatedRTT));
+        timeoutValue = estimatedRTT + 4* deviation;
+        
+    
     }
 
     /**

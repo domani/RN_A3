@@ -1,5 +1,6 @@
 package filecopy;
 
+import filecopy.FCpacket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -75,6 +76,13 @@ public class SendBuffer {
 	public FCpacket getPacket(int pos){
 		return sendBuf.get(pos);	
 	}
+        
+        public FCpacket getPacket(long seqNum){
+            for(FCpacket packet : sendBuf){
+                if(packet.getSeqNum() == seqNum) return packet;
+            }
+            return null;
+        }
 	
 	public int size(){
 		return sendBuf.size();
