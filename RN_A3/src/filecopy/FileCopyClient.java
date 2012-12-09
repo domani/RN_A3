@@ -73,8 +73,9 @@ public class FileCopyClient extends Thread {
         clientSocket = new DatagramSocket(SERVER_PORT);
         buffer.add(makeControlPacket());
         //noch seqNum 0 setzen vorm losschicken
-        clientSocket.send(new DatagramPacket(buffer.getPacket(0).getData(), UDP_PACKET_SIZE));
         startTimer(buffer.getPacket(buffer.size() - 1));
+        clientSocket.send(new DatagramPacket(buffer.getPacket(0).getData(), UDP_PACKET_SIZE));
+        
 
         //wieder anfang
         while (bytesRemaining > 0)
@@ -86,9 +87,10 @@ public class FileCopyClient extends Thread {
             FCpacket.writeBytes(aktSeqNum, aktData, 0, 8);
             
             //vorm senden timer setzen
+            startTimer(buffer.getPacket(buffer.size() - 1));
             DatagramPacket udpSendPacket = new DatagramPacket(aktData, UDP_PACKET_SIZE);
             clientSocket.send(udpSendPacket);
-            startTimer(buffer.getPacket(buffer.size() - 1));
+            
         }
         synchronized(buffer)
         {
@@ -185,10 +187,10 @@ public class FileCopyClient extends Thread {
         // ToDo
         //Starten Sie für jeden Timer einen Thread der mitgegebenen Klasse FC_Timer und passen Sie
         //den Code für Ihre Implementierung an
-        
+        startTimer(buffer.getPacket(seqNum));
         DatagramPacket udpSendPacket = new DatagramPacket(buffer.getPacket(seqNum).getData(), UDP_PACKET_SIZE);
         clientSocket.send(udpSendPacket);
-        startTimer(buffer.getPacket(seqNum));
+        
        
     }
 
