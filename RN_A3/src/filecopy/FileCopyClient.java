@@ -120,6 +120,7 @@ public class FileCopyClient extends Thread {
                             udpReceivePacket.getLength());
                     long seqNum = fcReceivePacket.getSeqNum();
                     buffer.setAckValid(seqNum);
+                    cancelTimer(buffer.getPacket(seqNum));
 
                     while (buffer.getPacket(0).isValidACK())
                     {
