@@ -31,11 +31,11 @@ public class SendBuffer {
 
 	}
 
-	public boolean isFull() {
+	public synchronized boolean isFull() {
 		return (sendBuf.size() >= windowSize);
 	}
         
-        public boolean isEmpty(){
+        public synchronized boolean isEmpty(){
             return sendBuf.isEmpty();
         }
 
@@ -52,20 +52,23 @@ public class SendBuffer {
                 notifyAll();
 	}
 	
-	public void setAckValid(long seqNum){
+	public synchronized void setAckValid(long seqNum){
 		for(FCpacket packet : sendBuf){
-		if(seqNum == packet.getSeqNum()) packet.setValidACK(true);
+		if(seqNum == packet.getSeqNum()){
+                    packet.setValidACK(true);
+                    System.out.println("Ack gesetzt bei " + seqNum);
+                }
 		}
 	}
 	
-	public void setAckInvalid(long seqNum){
+	public synchronized void setAckInvalid(long seqNum){
 		for(FCpacket packet : sendBuf){
 		if(seqNum == packet.getSeqNum()) packet.setValidACK(false);
 		}
 	}
 	
 	//muss anders, weil irgendwie sagen, dass seqNum nicht enthalten
-	public boolean getAck(long seqNum){
+	public synchronized boolean getAck(long seqNum){
 		for(FCpacket packet : sendBuf){
 		if(seqNum == packet.getSeqNum()) return packet.isValidACK();
 		}
@@ -73,18 +76,18 @@ public class SendBuffer {
 	}
 	
 	
-	public FCpacket getPacket(int pos){
+	public synchronized FCpacket getPacket(int pos){
 		return sendBuf.get(pos);	
 	}
         
-        public FCpacket getPacket(long seqNum){
+        public synchronized FCpacket getPacket(long seqNum){
             for(FCpacket packet : sendBuf){
                 if(packet.getSeqNum() == seqNum) return packet;
             }
             return null;
         }
 	
-	public int size(){
+	public synchronized int size(){
 		return sendBuf.size();
 	}
         

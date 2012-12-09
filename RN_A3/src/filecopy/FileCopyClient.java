@@ -66,26 +66,19 @@ public class FileCopyClient extends Thread {
 
     public void runFileCopyClient() throws FileNotFoundException, IOException, InterruptedException
     {
-        receivePackets();
-        
+        clientSocket = new DatagramSocket(SERVER_PORT+1);
         buffer.add(makeControlPacket());
+        receivePackets();
+        clientSocket.send(new DatagramPacket(buffer.getPacket(0).getSeqNumBytesAndData(), buffer.getPacket(0).getSeqNumBytesAndData().length,InetAddress.getByName(servername), SERVER_PORT));
         startTimer(buffer.getPacket(0));
-        clientSocket = new DatagramSocket(SERVER_PORT);
-        clientSocket.send(new DatagramPacket(buffer.getPacket(0).getSeqNumBytesAndData(), buffer.getPacket(0).getSeqNumBytesAndData().length));
-
 
         //wieder anfang
         while (bytesRemaining > 0)
         {
-            buffer.add(makeFCPacket());
-            long aktSeqNum = buffer.getPacket(buffer.size() - 1).getSeqNum();
-            byte aktData[] = buffer.getPacket(buffer.size() - 1).getData();
-
-            FCpacket.writeBytes(aktSeqNum, aktData, 0, 8);
-
-            //vorm senden timer setzen
-            startTimer(buffer.getPacket(buffer.size() - 1));
-            DatagramPacket udpSendPacket = new DatagramPacket(aktData, UDP_PACKET_SIZE);
+            FCpacket packet = makeFCPacket();
+            buffer.add(packet);
+            startTimer(packet);
+            DatagramPacket udpSendPacket = new DatagramPacket(packet.getSeqNumBytesAndData(), packet.getSeqNumBytesAndData().length,InetAddress.getByName(servername), SERVER_PORT);
             clientSocket.send(udpSendPacket);
 
         }
@@ -96,6 +89,8 @@ public class FileCopyClient extends Thread {
                 wait();
             }
         }
+        in.close();
+        f = null;
     }
 
     public void receivePackets()
@@ -104,11 +99,12 @@ public class FileCopyClient extends Thread {
             @Override
             public void run()
             {
-                while (!buffer.isEmpty() && bytesRemaining > 0)
+                System.out.println("ReceivePackets gestartet");
+                while (!buffer.isEmpty() || bytesRemaining > 0)
                 {
+                    
                     byte[] receiveData = new byte[UDP_PACKET_SIZE];
-                    DatagramPacket udpReceivePacket = new DatagramPacket(receiveData,
-                            UDP_PACKET_SIZE);
+                    DatagramPacket udpReceivePacket = new DatagramPacket(receiveData, UDP_PACKET_SIZE);
                     try
                     {
                         // Wait for data packet
@@ -122,13 +118,17 @@ public class FileCopyClient extends Thread {
                             udpReceivePacket.getLength());
                     long seqNum = fcReceivePacket.getSeqNum();
                     buffer.setAckValid(seqNum);
+                    
+                    
+                    
                     cancelTimer(buffer.getPacket(seqNum));
 
-                    while (buffer.getPacket(0).isValidACK())
+                    while (!buffer.isEmpty() && buffer.getPacket(0).isValidACK())
                     {
                         buffer.removePacket();
                     }
                 }
+                
             }
         }).start();
 
@@ -152,7 +152,7 @@ public class FileCopyClient extends Thread {
         //dateilänge - offset. falls d-o == 0 || rest < data_packet_size, dann nur restlänge reinschreiben
         bytesRemaining -= sendData.length;
 
-        FCpacket packet = new FCpacket(++nextSeqNum, sendData, sendData.length);
+        FCpacket packet = new FCpacket(nextSeqNum++, sendData, sendData.length);
         return packet;
     }
 
@@ -187,9 +187,14 @@ public class FileCopyClient extends Thread {
         // ToDo
         //Starten Sie für jeden Timer einen Thread der mitgegebenen Klasse FC_Timer und passen Sie
         //den Code für Ihre Implementierung an
+        System.out.println("Timeout ausgelöst bei " + seqNum);
+        FCpacket _tmp = buffer.getPacket(seqNum);
+        if(_tmp != null){
         startTimer(buffer.getPacket(seqNum));
-       // DatagramPacket udpSendPacket = new DatagramPacket(buffer.getPacket(seqNum).getData(), UDP_PACKET_SIZE);
-       // clientSocket.send(udpSendPacket);
+        }
+        
+        DatagramPacket udpSendPacket = new DatagramPacket(buffer.getPacket(seqNum).getSeqNumBytesAndData(), buffer.getPacket(seqNum).getSeqNumBytesAndData().length,InetAddress.getByName(servername), SERVER_PORT);
+        clientSocket.send(udpSendPacket);
 
 
     }
@@ -252,8 +257,7 @@ public class FileCopyClient extends Thread {
         //hier noch das einfügen, was übergeben werden muss
         //Konstruktor: new FileCopyClient("CowboyBebop", String sourcePath, String destPath, String windowSize, String errorRate)
         //zu testen (Werte ermitteln): windowsize = 1,8,128; error_rate: 10,100,1000                           
-        FileCopyClient myClient = new FileCopyClient("CowboyBebop", "C:/Users/Domani/Desktop/HAW/BSSicherheit.pdf", "C:/Users/Domani/Desktop/BSSicherheit.pdf",
-                "128", "100");
+        FileCopyClient myClient = new FileCopyClient("CowboyBebop", "C:/Users/Domani/Desktop/HAW/BSSicherheit.pdf", "C:/Users/Domani/Desktop/BSSicherheit.pdf", "8", "100");
         
         myClient.runFileCopyClient();
     }
