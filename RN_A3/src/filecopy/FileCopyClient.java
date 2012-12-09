@@ -185,6 +185,7 @@ public class FileCopyClient extends Thread {
         
         DatagramPacket udpSendPacket = new DatagramPacket(buffer.getPacket(seqNum).getData(), UDP_PACKET_SIZE);
         clientSocket.send(udpSendPacket);
+        startTimer(buffer.getPacket(seqNum));
        
     }
 
